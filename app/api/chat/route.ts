@@ -69,6 +69,9 @@ export async function GET(request: NextRequest) {
           _id: { $in: chat.participants }
         });
 
+        // Ensure TypeScript knows chat.messages is an array of Message
+        const messages: Message[] = chat.messages;
+
         return {
           id: chat._id.toString(),
           chatType: chat.chatType,
@@ -80,8 +83,8 @@ export async function GET(request: NextRequest) {
             avatar: p.avatar
           })),
           lastMessage: chat.lastMessage,
-          messageCount: chat.messages.length,
-          unreadCount: (chat.messages as Message[]).filter(
+          messageCount: messages.length,
+          unreadCount: messages.filter(
             (m: Message) =>
               !m.isRead && m.senderId !== currentUser._id.toString()
           ).length
