@@ -1,76 +1,59 @@
 import mongoose from 'mongoose';
 
-const TeamMemberSchema = new mongoose.Schema({
+const teamMemberSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+    type: String,
+    required: true
   },
   role: {
     type: String,
-    required: true,
+    required: true
   },
   permissions: [{
     type: String,
+    enum: ['read', 'write', 'admin'],
+    default: ['read']
   }],
   joinedAt: {
     type: Date,
-    default: Date.now,
-  },
+    default: Date.now
+  }
 });
 
-const TeamSchema = new mongoose.Schema({
+const teamSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   description: {
     type: String,
-    required: true,
+    required: true
   },
   founderId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  members: [TeamMemberSchema],
-  openRoles: [{
     type: String,
+    required: true
+  },
+  members: [teamMemberSchema],
+  openRoles: [{
+    type: String
   }],
   stage: {
     type: String,
     enum: ['idea', 'mvp', 'growth', 'scaling'],
-    default: 'idea',
+    default: 'idea'
   },
   industry: {
     type: String,
-    required: true,
+    required: true
   },
   isPublic: {
     type: Boolean,
-    default: false,
-  },
-  stripeSubscriptionId: {
-    type: String,
-  },
-  plan: {
-    type: String,
-    enum: ['free', 'pro', 'enterprise'],
-    default: 'free',
+    default: true
   },
   createdAt: {
     type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+    default: Date.now
+  }
 });
 
-TeamSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
-});
-
-export default mongoose.models.Team || mongoose.model('Team', TeamSchema); 
+export default mongoose.models.Team || mongoose.model('Team', teamSchema); 

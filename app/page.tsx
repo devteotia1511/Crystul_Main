@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useStore } from '@/lib/store';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Sparkles, Zap, Target, Star, CheckCircle } from 'lucide-react';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function HomePage() {
-  const { isAuthenticated } = useStore();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
@@ -25,10 +25,10 @@ export default function HomePage() {
   ];
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (status === "authenticated" && session) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [status, session, router]);
 
   useEffect(() => {
     const currentWord = words[currentWordIndex];
@@ -58,7 +58,8 @@ export default function HomePage() {
     }
   }, [currentText, isDeleting, currentWordIndex, words]);
 
-  if (isAuthenticated) return null;
+  // Don't render if already authenticated
+  if (status === "authenticated") return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">

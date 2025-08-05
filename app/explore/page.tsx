@@ -1,41 +1,39 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useStore } from '@/lib/store';
 import DashboardLayout from '@/components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Users, Filter } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ExplorePage() {
-  const { isAuthenticated, currentUser, getMatchingUsers } = useStore();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/auth/login');
-    }
-  }, [isAuthenticated, router]);
-
-  if (!isAuthenticated || !currentUser) {
+  if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Loading...
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-2">
+            Loading Explore...
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Please wait while we authenticate you.
+          <p className="text-gray-600 dark:text-gray-300 font-sans">
+            Please wait while we load the explore page.
           </p>
         </div>
       </div>
     );
   }
 
-  const matchingUsers = getMatchingUsers(currentUser.id);
+  if (status === "unauthenticated") {
+    router.push('/auth/login');
+    return null;
+  }
 
   return (
     <DashboardLayout>
@@ -44,100 +42,104 @@ export default function ExplorePage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">
-              Explore Entrepreneurs
+              Explore
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-1 font-sans">
-              Discover talented entrepreneurs to build amazing teams with
+              Discover entrepreneurs and teams that match your interests
             </p>
           </div>
-          <Button className="font-display font-medium">
+          <Button variant="outline" className="font-medium">
             <Filter className="mr-2 h-4 w-4" />
-            Filter
+            Filters
           </Button>
         </div>
 
-        {/* Search */}
+        {/* Search Bar */}
         <Card>
-          <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search by skills, interests, or experience..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search for entrepreneurs, skills, or interests..."
+                className="flex-1 bg-transparent border-none outline-none text-sm"
               />
             </div>
           </CardContent>
         </Card>
 
-        {/* Results */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {matchingUsers.map((user: any) => (
-            <Card key={user.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <CardTitle className="font-display font-semibold">{user.name}</CardTitle>
-                    <CardDescription className="font-sans">{user.email}</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-sm mb-2 font-sans">Skills</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {user.skills.slice(0, 3).map((skill: string) => (
-                      <Badge key={skill} variant="secondary" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-sm mb-2 font-sans">Looking for</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {user.lookingFor.slice(0, 2).map((role: string) => (
-                      <Badge key={role} variant="outline" className="text-xs">
-                        {role}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Badge variant="default" className="text-xs">
-                    {user.compatibility}% match
-                  </Badge>
-                  <Badge variant="secondary" className="text-xs">
-                    {user.experience}
-                  </Badge>
-                </div>
-
-                <Button className="w-full font-medium">
-                  <Users className="mr-2 h-4 w-4" />
-                  Connect
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        {/* No Results */}
+        <div className="text-center py-12">
+          <Search className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-2">
+            No Results Found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 font-sans">
+            Try adjusting your search criteria or explore different categories
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+              Web Development
+            </Badge>
+            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+              Product Management
+            </Badge>
+            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+              UI/UX Design
+            </Badge>
+            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+              Marketing
+            </Badge>
+          </div>
         </div>
 
-        {matchingUsers.length === 0 && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2 font-display">No matches found</h3>
-              <p className="text-muted-foreground font-sans">
-                Try adjusting your search criteria or update your profile to find better matches.
-              </p>
+        {/* Categories */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="font-display font-semibold">Entrepreneurs</CardTitle>
+              <CardDescription className="font-sans">
+                Find co-founders and team members
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-4">
+                <Users className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground font-sans">0 available</p>
+              </div>
             </CardContent>
           </Card>
-        )}
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="font-display font-semibold">Teams</CardTitle>
+              <CardDescription className="font-sans">
+                Join existing teams
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-4">
+                <Users className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground font-sans">0 available</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="font-display font-semibold">Projects</CardTitle>
+              <CardDescription className="font-sans">
+                Find project opportunities
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-4">
+                <Users className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground font-sans">0 available</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -1,313 +1,271 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useStore } from '@/lib/store';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { Users, Mail, Lock, User, Chrome, Plus, X } from 'lucide-react';
-import Link from 'next/link';
-import { toast } from 'sonner';
-
-const SKILL_OPTIONS = [
-  'Web Development', 'Mobile Development', 'UI/UX Design', 'Product Management',
-  'Marketing', 'Sales', 'Data Science', 'Machine Learning', 'DevOps',
-  'Backend Development', 'Frontend Development', 'Blockchain', 'Cybersecurity'
-];
-
-const INTEREST_OPTIONS = [
-  'AI/ML', 'FinTech', 'HealthTech', 'EdTech', 'E-commerce', 'SaaS',
-  'B2B', 'B2C', 'Climate Tech', 'Gaming', 'Social Impact', 'Enterprise'
-];
+import { signIn, useSession } from "next-auth/react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Mail, Lock, User, Chrome, Home, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    bio: '',
-    experience: '',
-    location: '',
-    timezone: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [skills, setSkills] = useState<string[]>([]);
-  const [interests, setInterests] = useState<string[]>([]);
-  const [lookingFor, setLookingFor] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { login, addUser } = useStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { data: session, status } = useSession();
   const router = useRouter();
+
+  // Redirect if already authenticated
+  if (status === "authenticated" && session) {
+    router.push("/dashboard");
+    return null;
+  }
+
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsGoogleLoading(true);
+      await signIn("google", { callbackUrl: "/dashboard" });
+    } catch (error) {
+      toast.error("Google sign-up failed. Please try again.");
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Simulate registration
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const newUser = {
-      id: Date.now().toString(),
-      ...formData,
-      skills,
-      interests,
-      lookingFor,
-      experience: formData.experience as 'beginner' | 'intermediate' | 'expert',
-      createdAt: new Date()
-    };
-
-    addUser(newUser);
-    login(newUser);
-    toast.success('Account created successfully!');
-    router.push('/dashboard');
     
-    setLoading(false);
-  };
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-  const addSkill = (skill: string) => {
-    if (!skills.includes(skill)) {
-      setSkills([...skills, skill]);
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Create user account
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Account created successfully! Please sign in.");
+        router.push("/auth/login");
+      } else {
+        toast.error(data.message || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const removeSkill = (skill: string) => {
-    setSkills(skills.filter(s => s !== skill));
-  };
-
-  const addInterest = (interest: string) => {
-    if (!interests.includes(interest)) {
-      setInterests([...interests, interest]);
-    }
-  };
-
-  const removeInterest = (interest: string) => {
-    setInterests(interests.filter(i => i !== interest));
-  };
-
-  const addLookingFor = (need: string) => {
-    if (!lookingFor.includes(need)) {
-      setLookingFor([...lookingFor, need]);
-    }
-  };
-
-  const removeLookingFor = (need: string) => {
-    setLookingFor(lookingFor.filter(n => n !== need));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4">
-      <Card className="w-full max-w-2xl mx-auto shadow-xl">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Header */}
+      <header className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+              <span className="text-lg">🦄</span>
             </div>
-            <span className="text-xl font-bold">TeamUp</span>
+            <span className="text-xl font-display font-bold">Unicorn Tank</span>
           </div>
-          <CardTitle className="text-2xl">Create your profile</CardTitle>
-          <CardDescription>
-            Tell us about yourself to find the perfect teammates
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/">
+            <Button variant="ghost" size="sm">
+              <Home className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </header>
+
+      {/* Register Form */}
+      <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-4">
+        <Card className="w-full max-w-md shadow-xl">
+          <CardHeader className="text-center">
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-2xl">🦄</span>
+              </div>
+              <span className="text-2xl font-display font-mono font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Unicorn Tank
+              </span>
+            </div>
+            <CardTitle className="text-2xl font-display font-bold">Create Account</CardTitle>
+            <CardDescription className="font-sans">
+              Join thousands of entrepreneurs building amazing teams
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {/* Google Sign Up Button */}
+            <Button
+              variant="outline"
+              className="w-full font-medium"
+              onClick={handleGoogleSignUp}
+              disabled={isGoogleLoading}
+            >
+              {isGoogleLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+              ) : (
+                <Chrome className="mr-2 h-4 w-4" />
+              )}
+              {isGoogleLoading ? "Signing up..." : "Continue with Google"}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground font-sans">
+                  Or register with email
+                </span>
+              </div>
+            </div>
+
+            {/* Email Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name" className="font-medium">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
-                    placeholder="Your full name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter your full name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="pl-10"
+                    onChange={handleInputChange}
+                    className="pl-10 font-sans"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="font-medium">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
+                    name="email"
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder="Enter your email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="pl-10"
+                    onChange={handleInputChange}
+                    className="pl-10 font-sans"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Create a secure password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                placeholder="Tell us about yourself, your background, and what you're passionate about..."
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                rows={3}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Experience Level</Label>
-                <Select value={formData.experience} onValueChange={(value) => setFormData({ ...formData, experience: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your experience" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner (0-2 years)</SelectItem>
-                    <SelectItem value="intermediate">Intermediate (2-5 years)</SelectItem>
-                    <SelectItem value="expert">Expert (5+ years)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="password" className="font-medium">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="pl-10 font-sans"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="City, Country"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                />
+                <Label htmlFor="confirmPassword" className="font-medium">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="pl-10 font-sans"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
+
+              <Button
+                type="submit"
+                className="w-full font-display font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating Account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
+              </Button>
+            </form>
+
+            <div className="text-center text-sm text-muted-foreground font-sans">
+              Already have an account?{" "}
+              <Link href="/auth/login" className="text-primary hover:underline">
+                Sign in
+              </Link>
             </div>
-
-            {/* Skills */}
-            <div className="space-y-2">
-              <Label>Your Skills</Label>
-              <Select onValueChange={addSkill}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Add your skills" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SKILL_OPTIONS.filter(skill => !skills.includes(skill)).map((skill) => (
-                    <SelectItem key={skill} value={skill}>{skill}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {skills.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="pr-1">
-                    {skill}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-1 ml-1"
-                      onClick={() => removeSkill(skill)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* Interests */}
-            <div className="space-y-2">
-              <Label>Interests</Label>
-              <Select onValueChange={addInterest}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Add your interests" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INTEREST_OPTIONS.filter(interest => !interests.includes(interest)).map((interest) => (
-                    <SelectItem key={interest} value={interest}>{interest}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {interests.map((interest) => (
-                  <Badge key={interest} variant="outline" className="pr-1">
-                    {interest}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-1 ml-1"
-                      onClick={() => removeInterest(interest)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* Looking For */}
-            <div className="space-y-2">
-              <Label>Looking For</Label>
-              <Select onValueChange={addLookingFor}>
-                <SelectTrigger>
-                  <SelectValue placeholder="What roles are you looking for?" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SKILL_OPTIONS.filter(need => !lookingFor.includes(need)).map((need) => (
-                    <SelectItem key={need} value={need}>{need}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {lookingFor.map((need) => (
-                  <Badge key={need} variant="default" className="pr-1">
-                    {need}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-1 ml-1"
-                      onClick={() => removeLookingFor(need)}
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </Button>
-          </form>
-
-          <div className="text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
-            <Link href="/auth/login" className="text-primary hover:underline">
-              Sign in
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

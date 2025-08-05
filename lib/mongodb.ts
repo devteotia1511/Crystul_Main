@@ -14,6 +14,13 @@ if (!cached) {
 }
 
 async function dbConnect() {
+  // In development, if MongoDB URI is a placeholder, skip connection
+  if (process.env.NODE_ENV === 'development' && 
+      (MONGODB_URI.includes('your-') || MONGODB_URI.includes('placeholder'))) {
+    console.warn('⚠️  Skipping MongoDB connection in development due to placeholder URI');
+    return null;
+  }
+
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {

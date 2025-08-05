@@ -5,99 +5,78 @@
  * and provides helpful error messages if any are missing.
  */
 
-interface EnvValidationResult {
-  isValid: boolean;
-  missing: string[];
-  errors: string[];
-}
-
-export function validateEnvironmentVariables(): EnvValidationResult {
+export function validateEnvironmentVariables() {
   const requiredVars = [
-    // NextAuth
     'NEXTAUTH_URL',
     'NEXTAUTH_SECRET',
-    
-    // Google OAuth
     'GOOGLE_CLIENT_ID',
     'GOOGLE_CLIENT_SECRET',
-    
-    // Firebase (public variables)
     'NEXT_PUBLIC_FIREBASE_API_KEY',
     'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
     'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
     'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
     'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
     'NEXT_PUBLIC_FIREBASE_APP_ID',
-    
-    // MongoDB
-    'MONGODB_URI',
-    
-    // Paytm
-    'PAYTM_MERCHANT_ID',
-    'PAYTM_MERCHANT_KEY',
-    'PAYTM_WEBSITE',
-    'PAYTM_INDUSTRY_TYPE',
-    'PAYTM_CHANNEL_ID',
-    'PAYTM_CALLBACK_URL',
+    'MONGODB_URI'
   ];
 
-  const missing: string[] = [];
-  const errors: string[] = [];
+  const missingVars: string[] = [];
+  const placeholderVars: string[] = [];
 
   for (const varName of requiredVars) {
     const value = process.env[varName];
     
-    if (!value || value.trim() === '') {
-      missing.push(varName);
-      errors.push(`Missing required environment variable: ${varName}`);
+    if (!value) {
+      missingVars.push(varName);
     } else if (value.includes('your-') || value.includes('placeholder')) {
-      errors.push(`Environment variable ${varName} contains placeholder value. Please set the actual value.`);
+      placeholderVars.push(varName);
     }
   }
 
-  return {
-    isValid: missing.length === 0 && errors.length === 0,
-    missing,
-    errors,
-  };
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  }
+
+  // Only warn about placeholder values in development, don't throw
+  if (placeholderVars.length > 0) {
+    console.warn(`⚠️  Environment variables contain placeholder values: ${placeholderVars.join(', ')}. Please set actual values for production.`);
+  }
 }
 
-export function validateEnvironmentVariablesOnStartup(): void {
-  if (process.env.NODE_ENV === 'production') {
-    const result = validateEnvironmentVariables();
-    
-    if (!result.isValid) {
-      console.error('❌ Environment validation failed:');
-      result.errors.forEach(error => console.error(`  - ${error}`));
-      console.error('\n📝 Please check your environment variables and ensure all required values are set.');
-      console.error('💡 For development, run: node setup-env.js');
-      console.error('💡 For production, set environment variables in your hosting platform.');
-      
-      // In production, we might want to exit the process
-      // process.exit(1);
-    } else {
-      console.log('✅ Environment variables validated successfully');
+export function validateEnvironmentVariablesOnStartup() {
+  if (typeof window === 'undefined') {
+    // Only run on server-side
+    try {
+      validateEnvironmentVariables();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Environment validation failed:', errorMessage);
+      // Don't throw in production to avoid breaking the app
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('⚠️  Continuing with placeholder values for development...');
+      }
     }
   }
 }
 
-// Helper function to get environment variable with validation
 export function getRequiredEnvVar(name: string): string {
   const value = process.env[name];
-  
-  if (!value || value.trim() === '') {
-    throw new Error(`Missing required environment variable: ${name}`);
+  if (!value) {
+    throw new Error(`Environment variable ${name} is required but not set`);
   }
   
+  // In development, allow placeholder values but warn
   if (value.includes('your-') || value.includes('placeholder')) {
-    throw new Error(`Environment variable ${name} contains placeholder value. Please set the actual value.`);
+    console.warn(`⚠️  Environment variable ${name} contains placeholder value. This will not work in production.`);
+    // For development, return the placeholder value instead of throwing
+    if (process.env.NODE_ENV === 'development') {
+      return value;
+    }
   }
   
   return value;
 }
 
-// Helper function to get optional environment variable with default
-export function getOptionalEnvVar(name: string, defaultValue: string): string {
-  const value = process.env[name];
-  return value && value.trim() !== '' ? value : defaultValue;
-} 
+export function getOptionalEnvVar(name: string, defaultValue: string = ''): string {
+  return process.env[name] || defaultValue;
+}
