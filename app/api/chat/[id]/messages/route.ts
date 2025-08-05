@@ -55,8 +55,18 @@ export async function GET(
       );
     }
 
+    interface MessageType {
+      id: string;
+      content: string;
+      senderId: string;
+      timestamp: string;
+      isRead: boolean; // Added isRead property
+      _id: string; // Added _id property
+      messageType?: string; // Added messageType property
+    } 
+
     // Mark messages as read
-    chat.messages.forEach(message => {
+    chat.messages.forEach((message: MessageType) => {
       if (message.senderId !== currentUser._id.toString() && !message.isRead) {
         message.isRead = true;
       }
@@ -65,7 +75,7 @@ export async function GET(
 
     // Get sender information for messages
     const messagesWithSenders = await Promise.all(
-      chat.messages.map(async (message) => {
+      chat.messages.map(async (message: MessageType) => {
         const sender = await User.findById(message.senderId);
         return {
           id: message._id.toString(),
