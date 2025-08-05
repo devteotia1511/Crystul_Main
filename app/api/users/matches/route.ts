@@ -4,6 +4,20 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 
+interface UserDocument {
+  _id: any;
+  name: string;
+  email: string;
+  avatar?: string;
+  skills: string[];
+  interests: string[];
+  experience: string;
+  bio?: string;
+  location?: string;
+  isPublic: boolean;
+  lookingFor: string[];
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,7 +38,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current user
-    const currentUser = await User.findOne({ email: session.user.email });
+    const currentUser = await User.findOne({ email: session.user.email }) as UserDocument | null;
     if (!currentUser) {
       return NextResponse.json(
         { success: false, message: "User not found" },
@@ -36,25 +50,35 @@ export async function GET(request: NextRequest) {
     const allUsers = await User.find({ 
       _id: { $ne: currentUser._id },
       isPublic: true 
-    });
+    }) as UserDocument[];
 
     // Calculate compatibility scores
-    const matches = allUsers.map(user => {
+    const matches = allUsers.map((user: UserDocument) => {
       let score = 0;
       
-      // Skill complementarity
-      const skillMatch = currentUser.skills.filter(skill => 
-        user.skills.includes(skill)
+      // Skill complementarity - ensure arrays exist and are arrays
+      const currentUserSkills = Array.isArray(currentUser.skills) ? currentUser.skills : [];
+      const userSkills = Array.isArray(user.skills) ? user.skills : [];
+      const currentUserLookingFor = Array.isArray(currentUser.lookingFor) ? currentUser.lookingFor : [];
+      
+      const skillMatch = currentUserSkills.filter((skill: string) => 
+        userSkills.includes(skill)
       ).length;
-      const skillComplement = currentUser.lookingFor.filter(need => 
-        user.skills.includes(need)
+      
+      const skillComplement = currentUserLookingFor.filter((need: string) => 
+        userSkills.includes(need)
       ).length;
+      
       score += (skillMatch * 2) + (skillComplement * 5);
       
-      // Interest alignment
-      const interestMatch = currentUser.interests.filter(interest => 
-        user.interests.includes(interest)
+      // Interest alignment - ensure arrays exist and are arrays
+      const currentUserInterests = Array.isArray(currentUser.interests) ? currentUser.interests : [];
+      const userInterests = Array.isArray(user.interests) ? user.interests : [];
+      
+      const interestMatch = currentUserInterests.filter((interest: string) => 
+        userInterests.includes(interest)
       ).length;
+      
       score += interestMatch * 3;
       
       // Experience diversity
@@ -67,8 +91,8 @@ export async function GET(request: NextRequest) {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        skills: user.skills,
-        interests: user.interests,
+        skills: userSkills,
+        interests: userInterests,
         experience: user.experience,
         bio: user.bio,
         location: user.location,

@@ -2,37 +2,96 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useStore } from '@/lib/store';
+import { useSession } from 'next-auth/react';
 import DashboardLayout from '@/components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Users, Target, Settings, Plus, Crown, Calendar } from 'lucide-react';
+import { MessageSquare, Users, Target, Settings, Plus, Crown, Calendar, Loader2 } from 'lucide-react';
 import TeamChat from '@/components/team-chat';
 import TeamTasks from '@/components/team-tasks';
 import Link from 'next/link';
 
+interface Team {
+  id: string;
+  name: string;
+  description: string;
+  founderId: string;
+  members: any[];
+  openRoles: string[];
+  stage: string;
+  industry: string;
+  isPublic: boolean;
+  createdAt: string;
+}
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  skills: string[];
+}
 
 export default function TeamDetailPage() {
   const { id } = useParams();
-  const { isAuthenticated, currentUser, teams, users } = useStore();
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const [team, setTeam] = useState<Team | null>(null);
+  const [founder, setFounder] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (status === "unauthenticated") {
       router.push('/auth/login');
+      return;
     }
-  }, [isAuthenticated, router]);
 
-  if (!isAuthenticated || !currentUser) {
+    if (status === "authenticated" && id) {
+      fetchTeamData();
+    }
+  }, [status, id, router]);
+
+  const fetchTeamData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch team data
+      const response = await fetch(`/api/teams/${id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setTeam(data.team);
+        setFounder(data.founder);
+      } else {
+        console.error('Failed to fetch team:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching team data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-300">Loading team...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (status === "unauthenticated") {
     return null;
   }
 
-  const team = teams.find(t => t.id === id);
-  
   if (!team) {
     return (
       <DashboardLayout>
@@ -51,14 +110,9 @@ export default function TeamDetailPage() {
     );
   }
 
-  const founder = users.find(u => u.id === team.founderId);
-  const teamMembers = team.members.map(member => ({
-    ...member,
-    user: users.find(u => u.id === member.userId)
-  })).filter(member => member.user);
-
-  const isFounder = team.founderId === currentUser.id;
-  const isMember = team.members.some(member => member.userId === currentUser.id);
+  const teamMembers = team.members || [];
+  const isFounder = team.founderId === session?.user?.email;
+  const isMember = teamMembers.some(member => member.userId === session?.user?.email);
   const hasAccess = isFounder || isMember;
 
   return (
@@ -119,29 +173,31 @@ export default function TeamDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Founder */}
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={founder?.avatar} alt={founder?.name} />
-                  <AvatarFallback>{founder?.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <p className="font-medium">{founder?.name}</p>
-                    <Crown className="w-4 h-4 text-yellow-500" />
+              {founder && (
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={founder.avatar} alt={founder.name} />
+                    <AvatarFallback>{founder.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <p className="font-medium">{founder.name}</p>
+                      <Crown className="w-4 h-4 text-yellow-500" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">Founder</p>
                   </div>
-                  <p className="text-sm text-muted-foreground">Founder</p>
                 </div>
-              </div>
+              )}
               
               {/* Members */}
               {teamMembers.map((member) => (
                 <div key={member.userId} className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={member.user?.avatar} alt={member.user?.name} />
-                    <AvatarFallback>{member.user?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={member.avatar} alt={member.name} />
+                    <AvatarFallback>{member.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-medium">{member.user?.name}</p>
+                    <p className="font-medium">{member.name}</p>
                     <p className="text-sm text-muted-foreground">{member.role}</p>
                   </div>
                 </div>
@@ -157,7 +213,7 @@ export default function TeamDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {team.openRoles.length > 0 ? (
+                {team.openRoles && team.openRoles.length > 0 ? (
                   team.openRoles.map((role) => (
                     <Badge key={role} variant="outline" className="mr-2 mb-2">
                       {role}
@@ -178,15 +234,15 @@ export default function TeamDetailPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Messages</span>
-                <span className="font-medium">24</span>
+                <span className="font-medium">0</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Tasks</span>
-                <span className="font-medium">8</span>
+                <span className="font-medium">0</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Completed</span>
-                <span className="font-medium">5</span>
+                <span className="font-medium">0</span>
               </div>
             </CardContent>
           </Card>
@@ -229,43 +285,45 @@ export default function TeamDetailPage() {
                 <CardContent>
                   <div className="space-y-6">
                     {/* Founder */}
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <Avatar className="h-12 w-12">
-                          <AvatarImage src={founder?.avatar} alt={founder?.name} />
-                          <AvatarFallback>{founder?.name?.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-semibold">{founder?.name}</h3>
-                            <Crown className="w-4 h-4 text-yellow-500" />
-                          </div>
-                          <p className="text-sm text-muted-foreground">{founder?.email}</p>
-                          <div className="flex gap-1 mt-2">
-                            {founder?.skills.slice(0, 3).map((skill) => (
-                              <Badge key={skill} variant="secondary" className="text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
+                    {founder && (
+                      <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={founder.avatar} alt={founder.name} />
+                            <AvatarFallback>{founder.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <h3 className="font-semibold">{founder.name}</h3>
+                              <Crown className="w-4 h-4 text-yellow-500" />
+                            </div>
+                            <p className="text-sm text-muted-foreground">{founder.email}</p>
+                            <div className="flex gap-1 mt-2">
+                              {founder.skills && founder.skills.slice(0, 3).map((skill) => (
+                                <Badge key={skill} variant="secondary" className="text-xs">
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
                         </div>
+                        <Badge variant="default">Founder</Badge>
                       </div>
-                      <Badge variant="default">Founder</Badge>
-                    </div>
+                    )}
 
                     {/* Members */}
                     {teamMembers.map((member) => (
                       <div key={member.userId} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center space-x-4">
                           <Avatar className="h-12 w-12">
-                            <AvatarImage src={member.user?.avatar} alt={member.user?.name} />
-                            <AvatarFallback>{member.user?.name?.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={member.avatar} alt={member.name} />
+                            <AvatarFallback>{member.name?.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <h3 className="font-semibold">{member.user?.name}</h3>
-                            <p className="text-sm text-muted-foreground">{member.user?.email}</p>
+                            <h3 className="font-semibold">{member.name}</h3>
+                            <p className="text-sm text-muted-foreground">{member.email}</p>
                             <div className="flex gap-1 mt-2">
-                              {member.user?.skills.slice(0, 3).map((skill) => (
+                              {member.skills && member.skills.slice(0, 3).map((skill) => (
                                 <Badge key={skill} variant="secondary" className="text-xs">
                                   {skill}
                                 </Badge>

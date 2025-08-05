@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useStore } from '@/lib/store';
+import { useSession } from 'next-auth/react';
 import DashboardLayout from '@/components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,7 @@ const ROLE_OPTIONS = [
 ];
 
 export default function CreateTeamPage() {
-  const { currentUser, addTeam } = useStore();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -42,30 +42,56 @@ export default function CreateTeamPage() {
   const [openRoles, setOpenRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Redirect if not authenticated
+  if (status === "unauthenticated") {
+    router.push('/auth/login');
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+    
+    if (!session?.user?.email) {
+      toast.error('Please sign in to create a team');
+      return;
+    }
+
+    if (!formData.name || !formData.description || !formData.industry) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
 
     setLoading(true);
 
-    // Simulate team creation
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/teams', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          industry: formData.industry,
+          stage: formData.stage,
+          openRoles: openRoles
+        }),
+      });
 
-    const newTeam = {
-      id: Date.now().toString(),
-      ...formData,
-      founderId: currentUser.id,
-      members: [],
-      openRoles,
-      stage: formData.stage as 'idea' | 'mvp' | 'growth' | 'scaling',
-      createdAt: new Date()
-    };
+      const data = await response.json();
 
-    addTeam(newTeam);
-    toast.success('Team created successfully!');
-    router.push(`/teams/${newTeam.id}`);
-    
-    setLoading(false);
+      if (data.success) {
+        toast.success('Team created successfully!');
+        router.push(`/teams/${data.team.id}`);
+      } else {
+        toast.error(data.message || 'Failed to create team');
+      }
+    } catch (error) {
+      console.error('Error creating team:', error);
+      toast.error('Failed to create team. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addRole = (role: string) => {
@@ -77,6 +103,19 @@ export default function CreateTeamPage() {
   const removeRole = (role: string) => {
     setOpenRoles(openRoles.filter(r => r !== role));
   };
+
+  if (status === "loading") {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
