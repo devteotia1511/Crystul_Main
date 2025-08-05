@@ -1,10 +1,7 @@
 import mongoose from 'mongoose';
+import { getRequiredEnvVar } from './env-validation';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI in .env.local');
-}
+const MONGODB_URI = getRequiredEnvVar('MONGODB_URI');
 
 let cached = (global as any).mongoose;
 

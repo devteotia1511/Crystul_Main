@@ -1,13 +1,14 @@
 import PaytmChecksum from 'paytmchecksum';
+import { getRequiredEnvVar, getOptionalEnvVar } from './env-validation';
 
 // Paytm Configuration
 export const PAYTM_CONFIG = {
-  MERCHANT_ID: process.env.PAYTM_MERCHANT_ID!,
-  MERCHANT_KEY: process.env.PAYTM_MERCHANT_KEY!,
-  WEBSITE: process.env.PAYTM_WEBSITE || 'WEBSTAGING',
-  INDUSTRY_TYPE: process.env.PAYTM_INDUSTRY_TYPE || 'Retail',
-  CHANNEL_ID: process.env.PAYTM_CHANNEL_ID || 'WEB',
-  CALLBACK_URL: process.env.PAYTM_CALLBACK_URL || 'http://localhost:3001/api/paytm/callback',
+  MERCHANT_ID: getRequiredEnvVar('PAYTM_MERCHANT_ID'),
+  MERCHANT_KEY: getRequiredEnvVar('PAYTM_MERCHANT_KEY'),
+  WEBSITE: getOptionalEnvVar('PAYTM_WEBSITE', 'WEBSTAGING'),
+  INDUSTRY_TYPE: getOptionalEnvVar('PAYTM_INDUSTRY_TYPE', 'Retail'),
+  CHANNEL_ID: getOptionalEnvVar('PAYTM_CHANNEL_ID', 'WEB'),
+  CALLBACK_URL: getRequiredEnvVar('PAYTM_CALLBACK_URL'),
 };
 
 // Subscription plans

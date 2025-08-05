@@ -2,12 +2,13 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import { getRequiredEnvVar } from '@/lib/env-validation';
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: getRequiredEnvVar('GOOGLE_CLIENT_ID'),
+      clientSecret: getRequiredEnvVar('GOOGLE_CLIENT_SECRET'),
     }),
   ],
   callbacks: {
