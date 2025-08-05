@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
@@ -27,7 +27,6 @@ export async function GET(
       );
     }
 
-    // Get current user
     const currentUser = await User.findOne({ email: session.user.email });
     if (!currentUser) {
       return NextResponse.json(
@@ -38,7 +37,6 @@ export async function GET(
 
     const chatId = params.id;
 
-    // Get chat
     const chat = await Chat.findById(chatId);
     if (!chat) {
       return NextResponse.json(
@@ -47,7 +45,6 @@ export async function GET(
       );
     }
 
-    // Check if user is participant
     if (!chat.participants.includes(currentUser._id.toString())) {
       return NextResponse.json(
         { success: false, message: "Access denied" },
@@ -60,12 +57,11 @@ export async function GET(
       content: string;
       senderId: string;
       timestamp: string;
-      isRead: boolean; // Added isRead property
-      _id: string; // Added _id property
-      messageType?: string; // Added messageType property
-    } 
+      isRead: boolean;
+      _id: string;
+      messageType?: string;
+    }
 
-    // Mark messages as read
     chat.messages.forEach((message: MessageType) => {
       if (message.senderId !== currentUser._id.toString() && !message.isRead) {
         message.isRead = true;
@@ -73,7 +69,6 @@ export async function GET(
     });
     await chat.save();
 
-    // Get sender information for messages
     const messagesWithSenders = await Promise.all(
       chat.messages.map(async (message: MessageType) => {
         const sender = await User.findById(message.senderId);
@@ -83,19 +78,21 @@ export async function GET(
           messageType: message.messageType,
           timestamp: message.timestamp,
           isRead: message.isRead,
-          sender: sender ? {
-            id: sender._id.toString(),
-            name: sender.name,
-            email: sender.email,
-            avatar: sender.avatar
-          } : null
+          sender: sender
+            ? {
+                id: sender._id.toString(),
+                name: sender.name,
+                email: sender.email,
+                avatar: sender.avatar,
+              }
+            : null,
         };
       })
     );
 
     return NextResponse.json({
       success: true,
-      messages: messagesWithSenders
+      messages: messagesWithSenders,
     });
   } catch (error) {
     console.error("Messages API error:", error);
@@ -112,7 +109,7 @@ export async function POST(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
@@ -128,7 +125,7 @@ export async function POST(
       );
     }
 
-    const { content, messageType = 'text' } = await request.json();
+    const { content, messageType = "text" } = await request.json();
 
     if (!content) {
       return NextResponse.json(
@@ -137,7 +134,6 @@ export async function POST(
       );
     }
 
-    // Get current user
     const currentUser = await User.findOne({ email: session.user.email });
     if (!currentUser) {
       return NextResponse.json(
@@ -147,8 +143,6 @@ export async function POST(
     }
 
     const chatId = params.id;
-
-    // Get chat
     const chat = await Chat.findById(chatId);
     if (!chat) {
       return NextResponse.json(
@@ -157,7 +151,6 @@ export async function POST(
       );
     }
 
-    // Check if user is participant
     if (!chat.participants.includes(currentUser._id.toString())) {
       return NextResponse.json(
         { success: false, message: "Access denied" },
@@ -165,37 +158,38 @@ export async function POST(
       );
     }
 
-    // Add message
     const newMessage = {
       senderId: currentUser._id.toString(),
       content: content,
       messageType: messageType,
       timestamp: new Date(),
-      isRead: false
+      isRead: false,
     };
 
     chat.messages.push(newMessage);
     chat.lastMessage = new Date();
     await chat.save();
 
-    // Get sender information
+    // ✅ Get the latest message (which now has _id)
+    const savedMessage = chat.messages.at(-1); // or use chat.messages[chat.messages.length - 1];
+
     const messageWithSender = {
-      id: newMessage._id.toString(),
-      content: newMessage.content,
-      messageType: newMessage.messageType,
-      timestamp: newMessage.timestamp,
-      isRead: newMessage.isRead,
+      id: savedMessage._id.toString(),
+      content: savedMessage.content,
+      messageType: savedMessage.messageType,
+      timestamp: savedMessage.timestamp,
+      isRead: savedMessage.isRead,
       sender: {
         id: currentUser._id.toString(),
         name: currentUser.name,
         email: currentUser.email,
-        avatar: currentUser.avatar
-      }
+        avatar: currentUser.avatar,
+      },
     };
 
     return NextResponse.json({
       success: true,
-      message: messageWithSender
+      message: messageWithSender,
     });
   } catch (error) {
     console.error("Message creation error:", error);
@@ -204,4 +198,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}

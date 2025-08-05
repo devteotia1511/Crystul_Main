@@ -190,7 +190,7 @@ export default function DashboardPage() {
               Here's what's happening with your teams today
             </p>
           </div>
-          <Button asChild className="font-display font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+          <Button asChild className="font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
             <Link href="/teams/create">
               <Plus className="mr-2 h-4 w-4" />
               Create Team
