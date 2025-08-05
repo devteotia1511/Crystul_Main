@@ -5,6 +5,15 @@ import dbConnect from "@/lib/mongodb";
 import Chat from "@/models/Chat";
 import User from "@/models/User";
 
+// Define the expected shape of a message
+type Message = {
+  senderId: string;
+  content: string;
+  messageType: string;
+  timestamp: Date;
+  isRead?: boolean;
+};
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,7 +33,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get current user
     const currentUser = await User.findOne({ email: session.user.email });
     if (!currentUser) {
       return NextResponse.json(
@@ -34,26 +42,27 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const chatType = searchParams.get('type'); // 'direct' or 'team'
-    const teamId = searchParams.get('teamId');
-    const otherUserId = searchParams.get('userId');
+    const chatType = searchParams.get("type");
+    const teamId = searchParams.get("teamId");
+    const otherUserId = searchParams.get("userId");
 
     let query: any = {
       participants: currentUser._id.toString(),
       isActive: true
     };
 
-    if (chatType === 'direct' && otherUserId) {
-      query.participants = { $all: [currentUser._id.toString(), otherUserId] };
-      query.chatType = 'direct';
-    } else if (chatType === 'team' && teamId) {
+    if (chatType === "direct" && otherUserId) {
+      query.participants = {
+        $all: [currentUser._id.toString(), otherUserId]
+      };
+      query.chatType = "direct";
+    } else if (chatType === "team" && teamId) {
       query.teamId = teamId;
-      query.chatType = 'team';
+      query.chatType = "team";
     }
 
     const chats = await Chat.find(query).sort({ lastMessage: -1 });
 
-    // Get chat participants information
     const chatsWithParticipants = await Promise.all(
       chats.map(async (chat) => {
         const participants = await User.find({
@@ -64,7 +73,7 @@ export async function GET(request: NextRequest) {
           id: chat._id.toString(),
           chatType: chat.chatType,
           teamId: chat.teamId,
-          participants: participants.map(p => ({
+          participants: participants.map((p) => ({
             id: p._id.toString(),
             name: p.name,
             email: p.email,
@@ -72,7 +81,10 @@ export async function GET(request: NextRequest) {
           })),
           lastMessage: chat.lastMessage,
           messageCount: chat.messages.length,
-          unreadCount: chat.messages.filter(m => !m.isRead && m.senderId !== currentUser._id.toString()).length
+          unreadCount: (chat.messages as Message[]).filter(
+            (m: Message) =>
+              !m.isRead && m.senderId !== currentUser._id.toString()
+          ).length
         };
       })
     );
@@ -93,7 +105,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
@@ -113,12 +125,14 @@ export async function POST(request: NextRequest) {
 
     if (!participants || !chatType) {
       return NextResponse.json(
-        { success: false, message: "Participants and chat type are required" },
+        {
+          success: false,
+          message: "Participants and chat type are required"
+        },
         { status: 400 }
       );
     }
 
-    // Get current user
     const currentUser = await User.findOne({ email: session.user.email });
     if (!currentUser) {
       return NextResponse.json(
@@ -127,10 +141,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ensure current user is in participants
-    const allParticipants = [...new Set([...participants, currentUser._id.toString()])];
+    const allParticipants = Array.from(new Set([...participants, currentUser._id.toString()]));
 
-    // Check if chat already exists
     let chat = await Chat.findOne({
       participants: { $all: allParticipants },
       chatType: chatType,
@@ -138,7 +150,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (!chat) {
-      // Create new chat
       chat = new Chat({
         participants: allParticipants,
         chatType: chatType,
@@ -147,12 +158,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Add message if provided
     if (message) {
       chat.messages.push({
         senderId: currentUser._id.toString(),
         content: message,
-        messageType: 'text',
+        messageType: "text",
         timestamp: new Date()
       });
       chat.lastMessage = new Date();
@@ -177,4 +187,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
