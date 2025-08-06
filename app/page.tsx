@@ -344,7 +344,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/pricing">
-              <Button size="lg" variant="outline" className="border-white bg-black hover:bg-white hover:text-purple-600 font-display font-semibold">
+              <Button size="lg" variant="outline" className="border-white bg-black text-white hover:bg-white hover:text-purple-600 font-display font-semibold">
                 View Pricing Plans
               </Button>
             </Link>
