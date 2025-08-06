@@ -4,6 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 
+export const dynamic = 'force-dynamic';
 interface UserDocument {
   _id: any;
   name: string;
