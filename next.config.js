@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const { withNetlify } = require('@netlify/next');
-
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -10,4 +8,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withNetlify(nextConfig);
+module.exports = nextConfig;
