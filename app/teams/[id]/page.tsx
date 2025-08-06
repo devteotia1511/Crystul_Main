@@ -323,11 +323,11 @@ export default function TeamDetailPage() {
                             <h3 className="font-semibold">{member.name}</h3>
                             <p className="text-sm text-muted-foreground">{member.email}</p>
                             <div className="flex gap-1 mt-2">
-                              {member.skills && member.skills.slice(0, 3).map((skill) => (
-                                <Badge key={skill} variant="secondary" className="text-xs">
-                                  {skill}
-                                </Badge>
-                              ))}
+                            {member.skills && member.skills.slice(0, 3).map((skill: string) => (
+                              <Badge key={skill} variant="secondary" className="text-xs">
+                                {skill}
+                              </Badge>
+                            ))}
                             </div>
                           </div>
                         </div>
