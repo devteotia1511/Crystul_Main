@@ -40,10 +40,10 @@ export default function TeamsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 font-serif p-3">
               Teams
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1 font-sans">
+            <p className="text-gray-600 dark:text-gray-500 mt-1 mx-3 font-sans">
               Manage your teams and find new opportunities
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function TeamsPage() {
 
         {/* Teams Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-400 transition-colors">
+        <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-2">
@@ -77,7 +77,7 @@ export default function TeamsPage() {
         </div>
 
         {/* Explore Section */}
-        <Card>
+        <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
           <CardHeader>
             <CardTitle className="font-display font-semibold">Explore Teams</CardTitle>
             <CardDescription className="font-sans">

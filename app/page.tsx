@@ -64,7 +64,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 sticky top-0 z-50">
+      <nav className="border-b  bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* Unicorn Logo */}
@@ -92,7 +92,7 @@ export default function HomePage() {
               <Button variant="ghost" className="font-medium">Sign In</Button>
             </Link>
             <Link href="/auth/register">
-              <Button className="font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button className="font-medium bg-gradient-to-r text-white from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                 Get Started
               </Button>
             </Link>
@@ -263,15 +263,15 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-display font-bold text-purple-600 mb-2">500+</div>
+              <div className="text-4xl font-display font-bold text-purple-600 mb-2">100+</div>
               <div className="text-gray-600 dark:text-gray-300 font-sans">Active Entrepreneurs</div>
             </div>
             <div>
-              <div className="text-4xl font-display font-bold text-pink-600 mb-2">150+</div>
+              <div className="text-4xl font-display font-bold text-pink-600 mb-2">50+</div>
               <div className="text-gray-600 dark:text-gray-300 font-sans">Teams Formed</div>
             </div>
             <div>
-              <div className="text-4xl font-display font-bold text-blue-600 mb-2">50+</div>
+              <div className="text-4xl font-display font-bold text-blue-600 mb-2">10+</div>
               <div className="text-gray-600 dark:text-gray-300 font-sans">Startups Launched</div>
             </div>
           </div>
@@ -360,7 +360,7 @@ export default function HomePage() {
               <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
                 <span className="text-lg">🦄</span>
               </div>
-              <span className="text-xl font-display font-bold">Unicorn Tank</span>
+              <span className="text-xl font-mono font-bold">Unicorn Tank</span>
             </div>
             <div className="text-gray-400 font-sans">
               © 2024 Unicorn Tank. All rights reserved.

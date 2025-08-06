@@ -121,31 +121,31 @@ export default function TeamDetailPage() {
         {/* Team Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center space-x-4 mb-4">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="flex items-center space-x-4 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 font-serif p-3">
+              <h1 className="text-3xl font-bold">
                 {team.name}
               </h1>
               <Badge variant="secondary">{team.stage}</Badge>
-              <Badge variant="outline">{team.industry}</Badge>
+              <Badge variant="outline" className='text-black-600'>{team.industry}</Badge>
               {team.isPublic && <Badge variant="default">Public</Badge>}
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-lg">
+            <p className="text-black text-lg">
               {team.description}
             </p>
             <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-              <div className="flex items-center">
+              <div className="flex items-center text-gray-500">
                 <Users className="w-4 h-4 mr-1" />
                 {teamMembers.length + 1} members
               </div>
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1" />
+              <div className="flex items-center text-gray-500">
+                <Calendar className="w-4 h-4 mr-1 " />
                 Created {new Date(team.createdAt).toLocaleDateString()}
               </div>
             </div>
           </div>
           <div className="flex gap-2">
             {!hasAccess && (
-              <Button>
+              <Button className='bg-emerald-500 hover:bg-blue-400 text-white'>
                 <Plus className="mr-2 h-4 w-4" />
                 Join Team
               </Button>
@@ -164,7 +164,7 @@ export default function TeamDetailPage() {
         {/* Team Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Members */}
-          <Card>
+            <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Users className="mr-2 h-5 w-5" />
@@ -176,7 +176,7 @@ export default function TeamDetailPage() {
               {founder && (
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={founder.avatar} alt={founder.name} />
+                    <AvatarImage src={founder.avatar} className='font-bold' alt={founder.name} />
                     <AvatarFallback>{founder.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -184,7 +184,7 @@ export default function TeamDetailPage() {
                       <p className="font-medium">{founder.name}</p>
                       <Crown className="w-4 h-4 text-yellow-500" />
                     </div>
-                    <p className="text-sm text-muted-foreground">Founder</p>
+                    <p className="text-sm text-slate-300">Founder</p>
                   </div>
                 </div>
               )}
@@ -206,7 +206,7 @@ export default function TeamDetailPage() {
           </Card>
 
           {/* Open Roles */}
-          <Card>
+          <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
             <CardHeader>
               <CardTitle>Open Roles</CardTitle>
               <CardDescription>Positions we're looking to fill</CardDescription>
@@ -227,21 +227,21 @@ export default function TeamDetailPage() {
           </Card>
 
           {/* Quick Stats */}
-          <Card>
+          <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
             <CardHeader>
               <CardTitle>Activity</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Messages</span>
+                <span className="text-sm text-muted-foreground text-slate-300">Messages</span>
                 <span className="font-medium">0</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Tasks</span>
+                <span className="text-sm text-muted-foreground text-slate-300">Tasks</span>
                 <span className="font-medium">0</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Completed</span>
+                <span className="text-sm text-muted-foreground text-slate-300">Completed</span>
                 <span className="font-medium">0</span>
               </div>
             </CardContent>
@@ -353,7 +353,7 @@ export default function TeamDetailPage() {
         )}
 
         {!hasAccess && (
-          <Card>
+          <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
             <CardContent className="text-center py-12">
               <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">Join the team to access more features</h3>

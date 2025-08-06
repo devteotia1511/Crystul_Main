@@ -474,7 +474,7 @@ export default function ChatPage() {
                           <span className="text-xs font-medium opacity-90">
                             {message.sender.name}
                           </span>
-                          <span className="text-xs opacity-70">
+                          <span className="text-xs px-3 opacity-70">
                             {formatTime(message.timestamp)}
                           </span>
                         </div>
@@ -561,7 +561,7 @@ export default function ChatPage() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type a message..."
-                    className="flex-1 bg-white border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                    className="flex-1 bg-white text-black font-display"
                     disabled={loading}
                   />
 

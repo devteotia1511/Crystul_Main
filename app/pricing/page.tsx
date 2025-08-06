@@ -73,7 +73,7 @@ export default function PricingPage() {
             <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
               <span className="text-lg">🦄</span>
             </div>
-            <span className="text-xl font-display font-bold">Unicorn Tank</span>
+            <span className="text-xl font-mono font-bold">Unicorn Tank</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/">
@@ -83,7 +83,7 @@ export default function PricingPage() {
               <Button variant="ghost" className="font-medium">Sign In</Button>
             </Link>
             <Link href="/auth/register">
-              <Button className="font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button className="font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                 Get Started
               </Button>
             </Link>
@@ -92,7 +92,7 @@ export default function PricingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20">
+      <section className="pt-20">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-900 dark:text-white mb-6">
@@ -249,7 +249,7 @@ export default function PricingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/register">
-                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 font-display font-semibold">
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 text-white to-pink-600 hover:from-purple-700 hover:to-pink-700 font-display font-semibold">
                   <Rocket className="mr-2 w-5 h-5" />
                   Start Building Today
                 </Button>
@@ -272,7 +272,7 @@ export default function PricingPage() {
               <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
                 <span className="text-lg">🦄</span>
               </div>
-              <span className="text-xl font-display font-bold">Unicorn Tank</span>
+              <span className="text-xl font-mono font-bold">Unicorn Tank</span>
             </div>
             <div className="text-gray-400 font-sans">
               © 2024 Unicorn Tank. All rights reserved.

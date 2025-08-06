@@ -112,7 +112,7 @@ export default function RegisterPage() {
             <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
               <span className="text-lg">🦄</span>
             </div>
-            <span className="text-xl font-display font-bold">Unicorn Tank</span>
+            <span className="text-xl font-mono font-bold">Unicorn Tank</span>
           </div>
           <Link href="/">
             <Button variant="ghost" size="sm">
@@ -130,11 +130,11 @@ export default function RegisterPage() {
               <div className="w-10 h-10 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-2xl">🦄</span>
               </div>
-              <span className="text-2xl font-display font-mono font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-mono font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Unicorn Tank
               </span>
             </div>
-            <CardTitle className="text-2xl font-display font-bold">Create Account</CardTitle>
+            <CardTitle className="text-2xl font-serif font-semibold">Create Account</CardTitle>
             <CardDescription className="font-sans">
               Join thousands of entrepreneurs building amazing teams
             </CardDescription>

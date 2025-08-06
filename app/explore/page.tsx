@@ -41,21 +41,21 @@ export default function ExplorePage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 font-serif p-3">
               Explore
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1 font-sans">
+            <p className="text-gray-600 dark:text-gray-500 mt-1 mx-3 font-sans">
               Discover entrepreneurs and teams that match your interests
             </p>
           </div>
-          <Button variant="outline" className="font-medium">
-            <Filter className="mr-2 h-4 w-4" />
+          <Button variant="outline" className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 font-medium text-white' >
+            <Filter className="mr-2 h-4 w-4 " />
             Filters
           </Button>
         </div>
 
         {/* Search Bar */}
-        <Card>
+        <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Search className="h-5 w-5 text-muted-foreground" />
@@ -70,24 +70,24 @@ export default function ExplorePage() {
 
         {/* No Results */}
         <div className="text-center py-12">
-          <Search className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-2">
+          <Search className="mx-auto h-16 w-16 text-muted-foreground mb-4 text-slate-500" />
+          <h2 className="text-xl font-display font-semibold text-gray-900 mb-2">
             No Results Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6 font-sans">
+          <p className="text-gray-600 dark:text-gray-500 mb-6 font-sans">
             Try adjusting your search criteria or explore different categories
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+            <Badge variant="outline" className="cursor-pointer p-3 bg-slate-600 hover:bg-emerald-600">
               Web Development
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+            <Badge variant="outline" className="cursor-pointer p-3 bg-slate-600  hover:bg-emerald-600">
               Product Management
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+            <Badge variant="outline" className="cursor-pointer p-3 bg-slate-600  hover:bg-emerald-600">
               UI/UX Design
             </Badge>
-            <Badge variant="outline" className="cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50">
+            <Badge variant="outline" className="cursor-pointer p-3 bg-slate-600  hover:bg-emerald-600">
               Marketing
             </Badge>
           </div>
@@ -95,7 +95,7 @@ export default function ExplorePage() {
 
         {/* Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white">
             <CardHeader>
               <CardTitle className="font-display font-semibold">Entrepreneurs</CardTitle>
               <CardDescription className="font-sans">
@@ -110,7 +110,7 @@ export default function ExplorePage() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white">
             <CardHeader>
               <CardTitle className="font-display font-semibold">Teams</CardTitle>
               <CardDescription className="font-sans">
@@ -125,7 +125,7 @@ export default function ExplorePage() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white">
             <CardHeader>
               <CardTitle className="font-display font-semibold">Projects</CardTitle>
               <CardDescription className="font-sans">

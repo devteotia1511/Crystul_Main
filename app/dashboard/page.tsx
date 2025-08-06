@@ -200,7 +200,7 @@ export default function DashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow p-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-display font-medium text-gray-700">Your Teams</CardTitle>
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -223,7 +223,6 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-display font-medium text-gray-700">Matches Found</CardTitle>
@@ -342,7 +341,7 @@ export default function DashboardPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center p-4">
                             <span className="text-white font-bold text-sm">{team.name.charAt(0)}</span>
                           </div>
                           <div>
@@ -358,7 +357,7 @@ export default function DashboardPage() {
                           <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
                             {team.stage}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs text-slate-600 font-mono">
                             {team.industry}
                           </Badge>
                           <span className="text-xs text-gray-500 font-sans flex items-center">
