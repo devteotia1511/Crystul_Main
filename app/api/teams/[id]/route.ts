@@ -48,14 +48,14 @@ export async function GET(
     }
 
     // Get team members data
-    const memberIds = team.members.map(member => member.userId);
+    const memberIds = team.members.map((member: { userId: string }) => member.userId);
     const members = await User.find({ _id: { $in: memberIds } });
 
     // Combine team member data
-    const teamMembersWithData = team.members.map(member => {
+    const teamMembersWithData = team.members.map((member: { userId: string }) => {
       const memberData = members.find(m => m._id.toString() === member.userId);
       return {
-        ...member.toObject(),
+        ...member,
         name: memberData?.name || 'Unknown User',
         email: memberData?.email || '',
         avatar: memberData?.avatar,
