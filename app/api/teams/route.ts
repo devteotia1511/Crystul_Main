@@ -33,13 +33,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get teams where user is founder or member
-    const teams = await Team.find({
-      $or: [
-        { founderId: user._id.toString() },
-        { "members.userId": user._id.toString() }
-      ]
-    }).populate('founderId', 'name email avatar');
+    // Check for skills filter in query params
+    const { searchParams } = new URL(request.url);
+    const skillsParam = searchParams.get('skills');
+    let teams;
+    if (skillsParam) {
+      const skillsArray = skillsParam.split(',').map(s => s.trim()).filter(Boolean);
+      teams = await Team.find({ openRoles: { $in: skillsArray } }).populate('founderId', 'name email avatar');
+    } else {
+      teams = await Team.find({}).populate('founderId', 'name email avatar');
+    }
 
     return NextResponse.json({
       success: true,

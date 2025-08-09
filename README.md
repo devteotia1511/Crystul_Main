@@ -166,12 +166,82 @@ When deploying to production:
 
 This project is licensed under the MIT License.
 
-## 🆘 Support
+<!-- ------------------------------------------------------- -->
 
-- Check the [Setup Guide](./SETUP.md) for detailed instructions
-- Review the [Security Guide](./SECURITY.md) for best practices
-- Open an issue for bugs or feature requests
+1. Firebase Setup
 
----
+🧩 Why are we using Firebase?
 
-**⚠️ Important**: Never commit real credentials to version control. Always use environment variables for sensitive data. 
+Firebase gives you ready-to-use backend services like Authentication and Realtime/Cloud Firestore Database — you don’t have to build login systems or database infrastructure from scratch.
+
+🔧 What are we doing?
+	•	Authentication → Google Sign-in:
+You’re letting users log in using their Google account, securely.
+	•	Firestore Database:
+It’s used to store and manage app data (like user profiles, posts, etc.) in real-time.
+
+💸 Free Tier Support (as of now):
+	•	Authentication: 10K verifications/month (Email, Google, etc.) – more than enough for small projects
+	•	Firestore:
+	•	50K document reads/day
+	•	20K writes/day
+	•	1 GB storage
+	•	Easily enough for a small-to-medium MVP
+
+⸻
+
+✅ 2. Google OAuth Setup
+
+🧩 Why are we using this?
+
+This is where you get Google login credentials (OAuth Client ID & Secret). Firebase needs this to handle Google sign-in securely.
+
+🔧 What are we doing?
+	•	Creating OAuth credentials to securely connect users’ Google accounts to your app.
+	•	Redirect URIs ensure that Google knows where to send the user after successful login.
+
+💸 Free Tier Support:
+	•	Google OAuth is free for basic usage
+	•	Google Cloud has a $300 free credit (once per new account) and many services like OAuth don’t charge for standard use.
+
+⸻
+
+✅ 3. MongoDB Setup
+
+🧩 Why are we using MongoDB?
+
+MongoDB stores app data like user information, products, transactions, etc. It’s a NoSQL document database, great for flexibility and speed.
+
+If you’re also using Firestore, MongoDB might be used for more complex or relational data that doesn’t suit Firestore — or vice versa.
+
+🔧 What are we doing?
+	•	Creating a cloud database on Atlas
+	•	Creating a user with permissions
+	•	Getting the connection URI to plug into your app (MONGODB_URI)
+
+💸 Free Tier Support:
+	•	Shared Cluster (M0 tier): Totally free
+	•	512MB storage
+	•	100 concurrent connections
+	•	Great for MVPs, portfolios, or small projects
+
+⸻
+
+🔐 What is .env.local?
+
+It’s where you store all your secret environment variables, like:
+	•	Firebase keys
+	•	Google OAuth Client ID/Secret
+	•	MongoDB connection URI
+
+This file should not be pushed to GitHub if your repo is public.
+
+
+Q. Why we use both?
+
+Some teams use:
+	•	Firestore for real-time user interaction
+	•	MongoDB for core data models or business logic
+
+For example: You could use Firebase Auth + Firestore to store real-time session info and use MongoDB for storing product data, orders, or analytics.
+

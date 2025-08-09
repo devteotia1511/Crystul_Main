@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, MessageSquare, Target, Plus, TrendingUp, Calendar, Bell, Loader2, ArrowRight, Users2, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Team {
   id: string;
@@ -55,6 +56,13 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [connectingUsers, setConnectingUsers] = useState<Set<string>>(new Set());
+  const ROLE_OPTIONS = [
+    'Technical Co-founder', 'Business Co-founder', 'CTO', 'CMO', 'CFO',
+    'Head of Product', 'Head of Marketing', 'Head of Sales', 'Head of Design',
+    'Backend Developer', 'Frontend Developer', 'Full Stack Developer',
+    'Mobile Developer', 'UI/UX Designer', 'Data Scientist', 'DevOps Engineer'
+  ];
+  const [selectedSkill, setSelectedSkill] = useState<string>('all');
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -64,16 +72,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (status === "authenticated" && session) {
-      fetchDashboardData();
+      fetchDashboardData(selectedSkill);
     }
-  }, [status, session]);
+  }, [status, session, selectedSkill]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (skillFilter?: string) => {
     try {
       setLoading(true);
-      
-      // Fetch teams
-      const teamsResponse = await fetch('/api/teams');
+      let teamsUrl = '/api/teams';
+      if (skillFilter && skillFilter !== 'all') {
+        teamsUrl += `?skills=${encodeURIComponent(skillFilter)}`;
+      }
+      const teamsResponse = await fetch(teamsUrl);
       const teamsData = await teamsResponse.json();
       
       if (teamsData.success) {
@@ -183,8 +193,8 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-display font-bold text-gray-900">
-              Welcome back, {session.user?.name || 'User'}! 👋
+            <h1 className="text-2xl font-serif text-gray-700 font-semibold">
+              Welcome back, {session.user?.name || 'User'}!
             </h1>
             <p className="text-gray-600 mt-1 font-sans">
               Here's what's happening with your teams today
@@ -296,6 +306,21 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Skills Filter Dropdown */}
+        <div className="mb-6 max-w-xs">
+          <Select value={selectedSkill} onValueChange={(value) => setSelectedSkill(value)}>
+            <SelectTrigger className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+              <SelectValue placeholder="Filter by Skill (Open Role)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Skills</SelectItem>
+              {ROLE_OPTIONS.map((role) => (
+                <SelectItem key={role} value={role}>{role}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Your Teams */}
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
@@ -331,7 +356,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No teams yet</h3>
                   <p className="text-gray-600 mb-4 font-sans">Start building your dream team today</p>
-                  <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <Button asChild className="bg-gradient-to-r from-blue-600  to-purple-600 hover:from-blue-700 hover:to-purple-700">
                     <Link href="/teams/create">Create Your First Team</Link>
                   </Button>
                 </div>
@@ -362,7 +387,7 @@ export default function DashboardPage() {
                           </Badge>
                           <span className="text-xs text-gray-500 font-sans flex items-center">
                             <Users2 className="h-3 w-3 mr-1" />
-                            {team.members.length + 1} members
+                            {team.members.length} members
                           </span>
                         </div>
                       </div>
@@ -465,7 +490,7 @@ export default function DashboardPage() {
                 ))
               )}
               {matches.length > 3 && (
-                <Button variant="outline" className="w-full font-medium border-green-200 text-green-700 hover:bg-green-50" asChild>
+                <Button variant="outline" className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:bg-black-50" asChild>
                   <Link href="/explore">View All Matches</Link>
                 </Button>
               )}

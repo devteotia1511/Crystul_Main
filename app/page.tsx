@@ -85,6 +85,12 @@ export default function HomePage() {
             </span>
           </div>
           <div className="flex items-center space-x-4">
+            <Link href="/ai-assistant">
+              <Button variant="ghost" className="font-medium">AI Assistant</Button>
+            </Link>
+            <Link href="/connect-founders">
+              <Button variant="ghost" className="font-medium">Connect with Founders</Button>
+            </Link>
             <Link href="/pricing">
               <Button variant="ghost" className="font-medium">Pricing</Button>
             </Link>
