@@ -7,7 +7,7 @@ export default function AiAssistantPage() {
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navbar */}
       <nav className="w-full flex items-center justify-between px-6 py-4 border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm">
-        <span className='text-2xl text-white font-mono font-bold'> 
+        <span className='text-2xl text-gray-700 font-mono font-bold'> 
           Unicorn Tank
         </span>
         <Link href="/" className="text-gray-700 dark:text-gray-200 hover:text-blue-600">
