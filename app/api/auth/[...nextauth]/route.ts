@@ -69,22 +69,27 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
-        const dbConnection = await dbConnect();
-        if (dbConnection) {
-          const existingUser = await User.findOne({ email: user.email });
-          if (!existingUser) {
-            await User.create({
-              name: user.name,
-              email: user.email,
-              avatar: user.image,
-              skills: [],
-              interests: [],
-              experience: 'Beginner',
-              lookingFor: [],
-              isPublic: true,
-              createdAt: new Date(),
-            });
+        try {
+          const dbConnection = await dbConnect();
+          if (dbConnection) {
+            const existingUser = await User.findOne({ email: user.email });
+            if (!existingUser) {
+              await User.create({
+                name: user.name,
+                email: user.email,
+                avatar: user.image,
+                skills: [],
+                interests: [],
+                experience: 'Beginner',
+                lookingFor: [],
+                isPublic: true,
+                createdAt: new Date(),
+              });
+            }
           }
+        } catch (err) {
+          console.error('Google sign-in user creation error:', err);
+          return false; // Prevents redirect to dashboard, shows error page
         }
       }
       return true;
