@@ -12,7 +12,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['connection_request', 'connection_accepted', 'team_invite', 'message', 'task_assigned'],
+    enum: ['connection_request', 'connection_accepted', 'team_invite', 'message', 'task_assigned', 'team_join_request', 'team_join_accepted', 'team_join_declined'],
     required: true
   },
   title: {

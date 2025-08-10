@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Sparkles, Zap, Target, Star, CheckCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Target, Star, CheckCircle, Menu } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -84,7 +85,8 @@ export default function HomePage() {
               Unicorn Tank
             </span>
           </div>
-          <div className="flex items-center space-x-4">
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link href="/ai-assistant">
               <Button variant="ghost" className="font-medium">AI Assistant</Button>
             </Link>
@@ -103,6 +105,31 @@ export default function HomePage() {
               </Button>
             </Link>
           </div>
+          {/* Mobile hamburger */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-9 w-9 p-0"><Menu className="h-6 w-6" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link href="/ai-assistant">AI Assistant</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/connect-founders">Connect with Founders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pricing">Pricing</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/login">Sign In</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/register">Get Started</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </nav>
 
@@ -114,7 +141,7 @@ export default function HomePage() {
             {/* Left Column - Typewriter Text */}
             <div className="space-y-8">
               <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-gray-900 dark:text-white leading-tight">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-gray-900 dark:text-white leading-tight">
                   Build Your{' '}
                   <span className="bg-gradient-to-r font-serif from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     {currentText}
@@ -165,20 +192,15 @@ export default function HomePage() {
                   <div className="relative bg-white dark:bg-gray-800 rounded-3xl p-2">
                     {/* Tilted Image Container */}
                     <div className="transform rotate-12 hover:rotate-0 transition-transform duration-500 ease-in-out">
-                      <div className="relative w-96 h-96 rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="relative w-full max-w-[22rem] sm:max-w-md md:w-96 md:h-96 aspect-square md:aspect-auto rounded-2xl overflow-hidden shadow-2xl mx-auto">
                         <Image
-                          src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800"
+                          // src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800"
+                          src="/coverpage.jpg"
                           alt="Team Collaboration"
                           fill
                           className="object-cover"
                           priority
                         />
-                        {/* Overlay with collaboration elements */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        <div className="absolute bottom-4 left-4 right-4 text-white">
-                          <h3 className="text-xl font-display font-bold mb-2">Team Collaboration</h3>
-                          <p className="text-sm font-sans opacity-90">Building amazing things together</p>
-                        </div>
                       </div>
                     </div>
                   </div>

@@ -13,6 +13,7 @@ import { MessageSquare, Users, Target, Settings, Plus, Crown, Calendar, Loader2 
 import TeamChat from '@/components/team-chat';
 import TeamTasks from '@/components/team-tasks';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface Team {
   id: string;
@@ -42,6 +43,15 @@ export default function TeamDetailPage() {
   const [team, setTeam] = useState<Team | null>(null);
   const [founder, setFounder] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [requesting, setRequesting] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [approveEmail, setApproveEmail] = useState('');
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [decliningId, setDecliningId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', description: '', isPublic: true });
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -53,6 +63,24 @@ export default function TeamDetailPage() {
       fetchTeamData();
     }
   }, [status, id, router]);
+
+  useEffect(() => {
+    let interval: any;
+    if (status === 'authenticated' && team && session?.user?.email) {
+      const founderMatch = team.founderId === session.user.email;
+      if (founderMatch) {
+        fetchPendingRequests();
+        interval = setInterval(fetchPendingRequests, 10000);
+      }
+    }
+    return () => interval && clearInterval(interval);
+  }, [status, team, session]);
+
+  useEffect(() => {
+    if (team) {
+      setEditForm({ name: team.name, description: team.description, isPublic: team.isPublic });
+    }
+  }, [team]);
 
   const fetchTeamData = async () => {
     try {
@@ -72,6 +100,127 @@ export default function TeamDetailPage() {
       console.error('Error fetching team data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingRequests = async () => {
+    try {
+      const res = await fetch('/api/notifications');
+      const data = await res.json();
+      if (data.success) {
+        const pending = data.notifications.filter((n: any) => n.type === 'team_join_request' && n.data?.teamId === id);
+        setPendingRequests(pending);
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const requestToJoin = async () => {
+    try {
+      setRequesting(true);
+      const res = await fetch(`/api/teams/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'request_join' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Join request sent to founder');
+      } else {
+        toast.error(data.message || 'Failed to send request');
+      }
+    } catch (e) {
+      toast.error('Failed to send request');
+    } finally {
+      setRequesting(false);
+    }
+  };
+
+  const approveJoin = async (targetUserId: string) => {
+    try {
+      setApproving(true);
+      const res = await fetch(`/api/teams/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve_join', targetUserId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('User approved and added to team');
+        fetchTeamData();
+        fetchPendingRequests();
+      } else {
+        toast.error(data.message || 'Failed to approve');
+      }
+    } catch (e) {
+      toast.error('Failed to approve');
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  const declineJoin = async (targetUserId: string) => {
+    try {
+      setDecliningId(targetUserId);
+      const res = await fetch(`/api/teams/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'decline_join', targetUserId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Join request declined');
+        fetchPendingRequests();
+      } else {
+        toast.error(data.message || 'Failed to decline');
+      }
+    } catch (e) {
+      toast.error('Failed to decline');
+    } finally {
+      setDecliningId(null);
+    }
+  };
+
+  const saveTeam = async () => {
+    try {
+      setSaving(true);
+      const res = await fetch(`/api/teams/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update', update: editForm })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Team updated');
+        setEditing(false);
+        fetchTeamData();
+      } else {
+        toast.error(data.message || 'Failed to update');
+      }
+    } catch (e) {
+      toast.error('Failed to update');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteTeam = async () => {
+    if (!confirm('Are you sure you want to delete this team? This cannot be undone.')) return;
+    try {
+      setDeleting(true);
+      const res = await fetch(`/api/teams/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Team deleted');
+        router.push('/teams');
+      } else {
+        toast.error(data.message || 'Failed to delete');
+      }
+    } catch (e) {
+      toast.error('Failed to delete');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -145,18 +294,51 @@ export default function TeamDetailPage() {
           </div>
           <div className="flex gap-2">
             {!hasAccess && (
-              <Button className='bg-emerald-500 hover:bg-blue-400 text-white'>
+              <Button className='bg-emerald-500 hover:bg-blue-400 text-white' onClick={requestToJoin} disabled={requesting}>
                 <Plus className="mr-2 h-4 w-4" />
-                Join Team
+                {requesting ? 'Requesting...' : 'Join Team'}
               </Button>
             )}
             {isFounder && (
-              <Button variant="outline" asChild>
-                <Link href={`/teams/${team.id}/settings`}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Link>
-              </Button>
+              <div className="flex items-center gap-2">
+                {!editing ? (
+                  <>
+                    <Button variant="outline" onClick={() => setEditing(true)}>
+                      Edit Team
+                    </Button>
+                    <Button variant="destructive" onClick={deleteTeam} disabled={deleting}>
+                      {deleting ? 'Deleting...' : 'Delete Team'}
+                    </Button>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <input
+                      className="border rounded px-3 py-2 text-sm"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      placeholder="Team name"
+                    />
+                    <input
+                      className="border rounded px-3 py-2 text-sm w-64"
+                      value={editForm.description}
+                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      placeholder="Description"
+                    />
+                    <label className="text-sm flex items-center gap-1">
+                      <input type="checkbox" checked={editForm.isPublic} onChange={(e) => setEditForm({ ...editForm, isPublic: e.target.checked })} />
+                      Public
+                    </label>
+                    <Button onClick={saveTeam} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+                    <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
+                  </div>
+                )}
+                <Button variant="outline" asChild>
+                  <Link href={`/teams/${team.id}/settings`}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -360,10 +542,50 @@ export default function TeamDetailPage() {
               <p className="text-muted-foreground mb-6">
                 Connect with the team to view chat, tasks, and collaborate together.
               </p>
-              <Button>
+              <Button onClick={requestToJoin} disabled={requesting}>
                 <Plus className="mr-2 h-4 w-4" />
-                Request to Join
+                {requesting ? 'Requesting...' : 'Request to Join'}
               </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Pending Join Requests for Founder */}
+        {isFounder && (
+          <Card className='bg-white'>
+            <CardHeader>
+              <CardTitle>Pending Join Requests</CardTitle>
+              <CardDescription>Approve users who requested to join</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingRequests.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No pending requests</p>
+              ) : (
+                <div className="space-y-3">
+                  {pendingRequests.map((req: any) => (
+                    <div key={req.id} className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={req.sender?.avatar} />
+                          <AvatarFallback>{req.sender?.name?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{req.sender?.name}</div>
+                          <div className="text-xs text-muted-foreground">{req.sender?.email}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => approveJoin(req.sender?.id)} disabled={approving}>
+                          {approving ? 'Approving...' : 'Approve'}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => declineJoin(req.sender?.id)} disabled={decliningId === req.sender?.id}>
+                          {decliningId === req.sender?.id ? 'Declining...' : 'Decline'}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

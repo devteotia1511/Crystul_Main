@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard-layout';
@@ -42,6 +42,8 @@ import {
   Camera
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface Chat {
   id: string;
@@ -72,6 +74,14 @@ interface Message {
   };
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  teamName?: string;
+}
+
 export default function ChatPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -85,6 +95,9 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -103,6 +116,13 @@ export default function ChatPage() {
       fetchMessages();
     }
   }, [selectedChat]);
+
+  // Fetch all users for dropdown
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      fetchAllUsers();
+    }
+  }, [status, session]);
 
   const fetchChats = async () => {
     try {
@@ -206,11 +226,42 @@ export default function ChatPage() {
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      toast.success(`File "${file.name}" uploaded successfully!`);
-      // Handle file upload logic here
+    if (!file || !selectedChat) return;
+
+    try {
+      setLoading(true);
+      const isImage = file.type.startsWith('image/');
+      const filePath = `chat-uploads/${selectedChat.id}/${Date.now()}-${file.name}`;
+      const fileRef = ref(storage, filePath);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+
+      // Send message with URL
+      const response = await fetch(`/api/chat/${selectedChat.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: url,
+          messageType: isImage ? 'image' : 'file'
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMessages(prev => [...prev, data.message]);
+        fetchChats();
+        toast.success('File sent');
+      } else {
+        toast.error('Failed to send file');
+      }
+    } catch (err) {
+      console.error('File upload error:', err);
+      toast.error('File upload failed');
+    } finally {
+      setLoading(false);
+      // reset input
+      (event.target as HTMLInputElement).value = '';
     }
   };
 
@@ -240,6 +291,49 @@ export default function ChatPage() {
     );
   });
 
+  const fetchAllUsers = async () => {
+    try {
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      if (data.success) setAllUsers(data.users);
+    } catch (e) {}
+  };
+
+  // Start conversation with selected user
+  const startConversation = async (user: User) => {
+    try {
+      setShowUserDropdown(false);
+      setLoading(true);
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participants: [user.id], chatType: 'direct' })
+      });
+      const data = await res.json();
+      if (data.success && data.chat) {
+        await fetchChats();
+        setSelectedChat({
+          id: data.chat.id,
+          chatType: data.chat.chatType,
+          teamId: data.chat.teamId,
+          participants: [
+            { id: user.id, name: user.name, email: user.email, avatar: user.avatar },
+            { id: session?.user?.email || '', name: session?.user?.name || '', email: session?.user?.email || '', avatar: session?.user?.image || '' }
+          ],
+          lastMessage: data.chat.lastMessage,
+          messageCount: 0,
+          unreadCount: 0
+        });
+      } else {
+        toast.error('Failed to start conversation');
+      }
+    } catch (e) {
+      toast.error('Failed to start conversation');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
@@ -268,29 +362,32 @@ export default function ChatPage() {
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-xl font-display font-semibold text-gray-900">Messages</h1>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700 shadow-sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-                  <DropdownMenuLabel className="text-gray-900">New Conversation</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    New Direct Message
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
-                    <Users className="mr-2 h-4 w-4" />
-                    Create Group Chat
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
-                    <Camera className="mr-2 h-4 w-4" />
-                    Start Video Call
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative">
+                <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700 shadow-sm" onClick={() => setShowUserDropdown((v) => !v)}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+                {showUserDropdown && (
+                  <div ref={dropdownRef} className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                    <div className="p-3 border-b font-semibold text-gray-900">Start Conversation</div>
+                    {allUsers.length === 0 ? (
+                      <div className="p-4 text-gray-500 text-sm">No users found</div>
+                    ) : (
+                      allUsers.map((user) => (
+                        <button key={user.id} className="w-full flex items-center px-4 py-2 hover:bg-blue-50 transition" onClick={() => startConversation(user)}>
+                          <Avatar className="h-8 w-8 mr-3">
+                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="font-medium text-gray-900 truncate">{user.name}</div>
+                            {user.teamName && <div className="text-xs text-gray-500 truncate">{user.teamName}</div>}
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />

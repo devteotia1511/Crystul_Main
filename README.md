@@ -245,3 +245,23 @@ Some teams use:
 
 For example: You could use Firebase Auth + Firestore to store real-time session info and use MongoDB for storing product data, orders, or analytics.
 
+
+## Email (SMTP) setup
+To enable email notifications (e.g., connection requests), set the following environment variables:
+
+```
+SMTP_HOST=your_smtp_host
+SMTP_PORT=587 # 465 for SSL, 587 for STARTTLS
+SMTP_USER=your_smtp_username_or_email
+SMTP_PASS=your_smtp_password_or_api_key
+# Optional; defaults to SMTP_USER
+SMTP_FROM=no-reply@yourdomain.com
+```
+
+Provider tips:
+- Gmail: use `smtp.gmail.com`, port 465 or 587, and a Google App Password (2FA required). `SMTP_FROM` should be your Gmail address.
+- Mailtrap (testing): use the SMTP credentials from your Mailtrap inbox; emails are captured in Mailtrap.
+- SendGrid: `SMTP_HOST=smtp.sendgrid.net`, `SMTP_USER=apikey`, `SMTP_PASS=<your-sendgrid-api-key>`, and `SMTP_FROM` must be a verified sender.
+
+The app sends as: `Sender Name via Unicorn Tank <SMTP_FROM>` and sets `Reply-To` to the actual sender's email so replies go directly to them.
+

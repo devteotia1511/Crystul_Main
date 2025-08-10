@@ -4,6 +4,8 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import Notification from "@/models/Notification";
+import { sendEmail, verifyEmailTransport } from '@/lib/email';
+import Chat from "@/models/Chat";
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,6 +91,48 @@ export async function POST(request: NextRequest) {
     });
 
     await notification.save();
+
+    // Ensure a direct chat exists between the two users
+    try {
+      const participants = [currentUser._id.toString(), targetUser._id.toString()];
+      let chat = await Chat.findOne({
+        chatType: 'direct',
+        participants: { $all: participants }
+      });
+      if (!chat) {
+        chat = new Chat({
+          participants,
+          chatType: 'direct',
+          teamId: null,
+          messages: [],
+          lastMessage: new Date(),
+          isActive: true,
+        });
+        await chat.save();
+      }
+    } catch (e) {
+      console.error('Failed to ensure direct chat exists:', e);
+    }
+
+    // Send email notification to the target user
+    try {
+      // Verify SMTP transport (logs success/failure)
+      await verifyEmailTransport();
+
+      await sendEmail({
+        to: targetUser.email,
+        subject: `New Connection Request from ${currentUser.name}`,
+        text: `Hello ${targetUser.name},\n\n${currentUser.name} (${currentUser.email}) wants to connect with you on Unicorn Tank. Log in to your dashboard to accept or view the request.`,
+        html: `<p>Hello ${targetUser.name},</p>
+               <p><strong>${currentUser.name}</strong> (${currentUser.email}) wants to connect with you on Unicorn Tank.</p>
+               <p>Log in to your dashboard to accept or view the request.</p>
+               <p style="color: #888; font-size: 12px;">This is an automated notification from Unicorn Tank.</p>`,
+        replyTo: currentUser.email,
+        fromName: currentUser.name,
+      });
+    } catch (err) {
+      console.error('Failed to send connection request email:', err);
+    }
 
     return NextResponse.json({
       success: true,

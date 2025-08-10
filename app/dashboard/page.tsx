@@ -321,8 +321,8 @@ export default function DashboardPage() {
           </Select>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Your Teams */}
+        {/* All Teams Section (now first, grid-cols-2) */}
+        <div>
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -361,49 +361,53 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               ) : (
-                teams.map((team) => (
-                  <div key={team.id} className="group p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 bg-white/50">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center p-4">
-                            <span className="text-white font-bold text-sm">{team.name.charAt(0)}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {teams.map((team) => (
+                    <div key={team.id} className="group p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 bg-white/50">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center p-4">
+                              <span className="text-white font-bold text-sm">{team.name.charAt(0)}</span>
+                            </div>
+                            <div>
+                              <h3 className="font-display font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                {team.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 font-sans line-clamp-2">
+                                {team.description}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-display font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                              {team.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 font-sans line-clamp-2">
-                              {team.description}
-                            </p>
+                          <div className="flex items-center gap-2 mt-3">
+                            <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
+                              {team.stage}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs text-slate-600 font-mono">
+                              {team.industry}
+                            </Badge>
+                            <span className="text-xs text-gray-500 font-sans flex items-center">
+                              <Users2 className="h-3 w-3 mr-1" />
+                              {team.members.length} members
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-3">
-                          <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
-                            {team.stage}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs text-slate-600 font-mono">
-                            {team.industry}
-                          </Badge>
-                          <span className="text-xs text-gray-500 font-sans flex items-center">
-                            <Users2 className="h-3 w-3 mr-1" />
-                            {team.members.length} members
-                          </span>
-                        </div>
+                        <Button variant="outline" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Link href={`/teams/${team.id}`}>
+                            <ArrowRight className="h-4 w-4" />
+                          </Link>
+                        </Button>
                       </div>
-                      <Button variant="outline" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Link href={`/teams/${team.id}`}>
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
+        </div>
 
-          {/* Potential Matches */}
+        {/* Potential Matches Section (now below) */}
+        <div>
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -442,54 +446,56 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               ) : (
-                matches.slice(0, 3).map((user) => (
-                  <div key={user.id} className="group p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all duration-200 bg-white/50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={user.avatar} alt={user.name} />
-                          <AvatarFallback className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
-                            {user.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <h3 className="font-display font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
-                            {user.name}
-                          </h3>
-                          <p className="text-sm text-gray-600 font-sans">
-                            {user.skills.slice(0, 2).join(', ')}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs bg-green-100 text-green-700 border-green-200">
-                              {user.compatibility}% match
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs">
-                              {user.experience}
-                            </Badge>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {matches.slice(0, 6).map((user) => (
+                    <div key={user.id} className="group p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all duration-200 bg-white/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarFallback className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
+                              {user.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h3 className="font-display font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
+                              {user.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 font-sans">
+                              {user.skills.slice(0, 2).join(', ')}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs bg-green-100 text-green-700 border-green-200">
+                                {user.compatibility}% match
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs">
+                                {user.experience}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 text-white hover:bg-green-700"
+                          onClick={() => handleConnect(user.id)}
+                          disabled={connectingUsers.has(user.id)}
+                        >
+                          {connectingUsers.has(user.id) ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Connecting...
+                            </>
+                          ) : (
+                            'Connect'
+                          )}
+                        </Button>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="font-medium opacity-0 group-hover:opacity-100 transition-opacity border-green-200 text-green-700 hover:bg-green-50"
-                        onClick={() => handleConnect(user.id)}
-                        disabled={connectingUsers.has(user.id)}
-                      >
-                        {connectingUsers.has(user.id) ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Connecting...
-                          </>
-                        ) : (
-                          'Connect'
-                        )}
-                      </Button>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
-              {matches.length > 3 && (
+              {matches.length > 6 && (
                 <Button variant="outline" className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:text-white shadow-lg hover:bg-black-50" asChild>
                   <Link href="/explore">View All Matches</Link>
                 </Button>
