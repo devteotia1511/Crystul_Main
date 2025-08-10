@@ -19,7 +19,7 @@ export default function ConnectFoundersPage() {
         <p className="max-w-xl text-center text-lg md:text-xl text-gray-700 dark:text-gray-200 mb-8">
           Get first-hand guidance for starting your own venture - straight from experienced startup founders. Book a call, discuss your ideas, and gain valuable insights tailored to your journey.<br/><br/>
           Each founder sets their own rate for their time, so you can choose and book accordingly. After your conversation, if you find their advice fruitful and impactful, you can show your appreciation by giving them a great rating.<br/><br/>
-          <span className="font-semibold">Your startup journey, powered by real-world experience - just one call away.</span>
+          <span className="font-semibold">Your startup journey, powered by real-world experience just one call away.</span>
         </p>
         <div className="w-full flex justify-center mb-8">
           <span className="text-6xl animate-bounce">📞</span>

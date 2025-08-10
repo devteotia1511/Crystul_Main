@@ -209,13 +209,13 @@ export default function TeamDetailPage() {
           <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
             <CardHeader>
               <CardTitle>Open Roles</CardTitle>
-              <CardDescription>Positions we're looking to fill</CardDescription>
+              <CardDescription className='text-gray-400'>Positions we're looking to fill</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-2 text-white">
                 {team.openRoles && team.openRoles.length > 0 ? (
                   team.openRoles.map((role) => (
-                    <Badge key={role} variant="outline" className="mr-2 mb-2">
+                    <Badge key={role} variant="outline" className="mr-2 mb-2 text-white">
                       {role}
                     </Badge>
                   ))

@@ -150,14 +150,14 @@ export default function ExplorePage() {
               {filteredTeams.map((team: Team) => (
                 <Card key={team.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white h-56 flex flex-col">
                   <CardHeader className="pb-1 p-3">
-                    <CardTitle className="font-display font-semibold text-base">{team.name}</CardTitle>
-                    <CardDescription className="font-sans">{team.industry}</CardDescription>
+                    <CardTitle className="font-display font-semibold font-2xl font-serif">{team.name}</CardTitle>
+                    <CardDescription className="font-sans text-gray-400">{team.industry}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col p-3 pt-0 min-h-0">
                     <div className="mb-2 text-sm line-clamp-2 overflow-hidden">{team.description}</div>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {team.openRoles && team.openRoles.map((role: string, idx: number) => (
-                        <Badge key={idx} variant="outline" className="bg-slate-600">{role}</Badge>
+                        <Badge key={idx} variant="outline" className="bg-slate-600 text-white-500">{role}</Badge>
                       ))}
                     </div>
                     <div className="text-xs text-gray-300">Stage: {team.stage}</div>
@@ -183,7 +183,7 @@ export default function ExplorePage() {
                   <CardHeader className="flex flex-row items-center gap-3">
                     <Avatar>
                       <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+                      <AvatarFallback className='bg-gray-700'>{user.name?.[0]}</AvatarFallback>
                     </Avatar>
                     <div>
                       <CardTitle className="font-display font-semibold">{user.name}</CardTitle>

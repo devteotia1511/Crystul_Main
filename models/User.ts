@@ -29,8 +29,8 @@ const userSchema = new mongoose.Schema({
   }],
   experience: {
     type: String,
-    enum: ['beginner', 'intermediate', 'expert'],
-    default: 'beginner'
+    enum: ['Beginner', 'Intermediate', 'Expert'],
+    default: 'Beginner'
   },
   lookingFor: [{
     type: String

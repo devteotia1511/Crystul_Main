@@ -9,7 +9,7 @@ export interface User {
   bio?: string;
   skills: string[];
   interests: string[];
-  experience: 'beginner' | 'intermediate' | 'expert';
+  experience: 'Beginner' | 'intermediate' | 'Expert';
   lookingFor: string[];
   location?: string;
   timezone?: string;

@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       password: hashedPassword,
       skills: [],
       interests: [],
-      experience: "beginner",
+      experience: "Beginner",
       lookingFor: [],
       createdAt: new Date(),
     });

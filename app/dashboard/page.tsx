@@ -331,7 +331,7 @@ export default function DashboardPage() {
                     <Building2 className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <CardTitle className="font-display font-semibold text-gray-900">Your Teams</CardTitle>
+                    <CardTitle className="font-display font-semibold text-gray-900">All Teams</CardTitle>
                     <CardDescription className="font-sans text-gray-600">
                       Teams you've created or joined
                     </CardDescription>
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                 ))
               )}
               {matches.length > 3 && (
-                <Button variant="outline" className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:bg-black-50" asChild>
+                <Button variant="outline" className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:text-white shadow-lg hover:bg-black-50" asChild>
                   <Link href="/explore">View All Matches</Link>
                 </Button>
               )}
