@@ -93,9 +93,12 @@ export default function HomePage() {
             <Link href="/connect-founders">
               <Button variant="ghost" className="font-medium">Connect with Founders</Button>
             </Link>
-            <Link href="/pricing">
-              <Button variant="ghost" className="font-medium">Pricing</Button>
+            <Link href="/explore">
+              <Button variant="ghost" className="font-medium">Explore Teams</Button>
             </Link>
+            {/* <Link href="/pricing">
+              <Button variant="ghost" className="font-medium">Pricing</Button>
+            </Link> */}
             <Link href="/auth/login">
               <Button variant="ghost" className="font-medium">Sign In</Button>
             </Link>
@@ -119,7 +122,7 @@ export default function HomePage() {
                   <Link href="/connect-founders">Connect with Founders</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/pricing">Pricing</Link>
+                  <Link href="/explore">Explore Teams</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/auth/login">Sign In</Link>
@@ -146,7 +149,7 @@ export default function HomePage() {
                   <span className="bg-gradient-to-r font-serif from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     {currentText}
                   </span>
-                  <span className="animate-pulse">|</span>
+                  <span className="animate-pulse"></span>
                 </h1>
                 <p className="text-xl md:text-2xl font-sans text-gray-600 dark:text-gray-300 leading-relaxed">
                   Connect with like-minded entrepreneurs, find your perfect co-founders, and turn your startup ideas into reality with our intelligent matchmaking platform.
@@ -306,6 +309,89 @@ export default function HomePage() {
         </div>
       </section>
 
+
+      {/* Funding Partners Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-4">
+            Raise Funding with Our Partners
+          </h2>
+          <p className="text-lg font-sans text-gray-600 dark:text-gray-300">
+            Registered teams can connect with funding partners, pitch, and raise for growth
+          </p>
+        </div>
+
+        {/* Row 1 */}
+        <div className="grid md:grid-cols-2 gap-10 items-center mb-16">
+          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <Image src="/fundraising1.png" alt="Funding discussion" fill className="object-cover" />
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-3xl font-serif font-semibold text-gray-900 dark:text-white">
+              Discover and Apply to Curated Funding Partners
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 font-sans">
+              As a verified team on Unicorn Tank, you gain access to a curated pool of funding partners
+              and accelerators. Share your profile, traction, and goals — our platform helps route your
+              pitch to the most relevant partners.
+            </p>
+            <ul className="list-disc ml-5 space-y-2 text-gray-600 dark:text-gray-300 font-sans">
+              <li>Create a rich team profile and funding round details</li>
+              <li>Get matched with partners aligned to your stage and industry</li>
+              <li>Track outreach and communication in one place</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Row 2 (alternate sides) */}
+        <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
+          <div className="md:order-2 relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <Image src="/fundraising2.png" alt="Pitch deck review" fill className="object-cover" />
+          </div>
+          <div className="md:order-1 space-y-3">
+            <h3 className="text-3xl font-serif font-semibold text-gray-900 dark:text-white">
+              Pitch, Get Feedback, and Close Your Round
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 font-sans">
+              Start a conversation directly with partners, share your deck and metrics, and coordinate
+              follow-ups from within chat. When it’s a fit, move from intro to diligence seamlessly.
+            </p>
+            <ul className="list-disc ml-5 space-y-2 text-gray-600 dark:text-gray-300 font-sans">
+              <li>Direct messaging with partners</li>
+              <li>Share docs and links securely</li>
+              <li>Stay organized with a single source of truth</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Scrolling partner logos */}
+        <div className="relative overflow-hidden py-6 border-t border-b border-gray-200 dark:border-gray-800 -mx-4 sm:-mx-6 lg:-mx-8">
+          <div className="flex items-center gap-12 whitespace-nowrap animate-[marquee_20s_linear_infinite]">
+            <div className="flex items-center gap-12 shrink-0">
+              {['Sequoia','Accel','YC','Lightspeed','Andreessen Horowitz','Tiger Global','Matrix','Khosla','Bessemer','General Catalyst'].map((name, idx) => (
+                <span key={idx} className="text-gray-500 dark:text-gray-300 font-display text-lg md:text-xl opacity-80 hover:opacity-100 transition">
+                  {name}
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center gap-12 shrink-0" aria-hidden="true">
+              {['Sequoia','Accel','YC','Lightspeed','Andreessen Horowitz','Tiger Global','Matrix','Khosla','Bessemer','General Catalyst'].map((name, idx) => (
+                <span key={`dup-${idx}`} className="text-gray-500 dark:text-gray-300 font-display text-lg md:text-xl opacity-80 hover:opacity-100 transition">
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <style jsx global>{`
+          @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
+      </section>
+
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
@@ -320,7 +406,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              name: "Sarah Chen",
+              name: "Rohit Taneja",
               title: "CEO, TechFlow",
               content: "Unicorn Tank helped me find the perfect CTO for my SaaS startup. The matching algorithm is incredibly accurate!",
               rating: 5
@@ -332,7 +418,7 @@ export default function HomePage() {
               rating: 5
             },
             {
-              name: "Emily Rodriguez",
+              name: "Priety Thapar",
               title: "Co-founder, HealthSync",
               content: "Found my business partner here and we've already raised our seed round. Highly recommend!",
               rating: 5
