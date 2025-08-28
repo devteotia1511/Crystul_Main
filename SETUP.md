@@ -1,6 +1,6 @@
-# 🦄 Unicorn Tank - Setup Guide
+# 🦄 Crystul - Setup Guide
 
-This guide will help you set up Firebase, MongoDB, and Paytm integration for your Unicorn Tank application.
+This guide will help you set up Firebase, MongoDB, and Paytm integration for your Crystul application.
 
 ## 📋 Prerequisites
 
@@ -42,7 +42,7 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
 NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id
 
 # MongoDB Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/unicorntank?retryWrites=true&w=majority
+MONGODB_URI=jhjkaafkak
 
 # Paytm Configuration
 PAYTM_MERCHANT_ID=your-paytm-merchant-id

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Bell, Check, X, MessageSquare, Users } from 'lucide-react';
+import { Bell, Check, X, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Notification {
@@ -168,8 +168,8 @@ export default function NotificationDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative rounded-full hover:bg-white">
-          <Bell className="h-5 w-5 text-black hover:text-red-900" />
+        <Button variant="ghost" size="sm" className="relative rounded-full hover:bg-primary/10 text-foreground hover:text-primary">
+          <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge 
               variant="destructive" 
@@ -180,16 +180,18 @@ export default function NotificationDropdown() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        <DropdownMenuLabel className="flex items-center justify-between">
+      
+      <DropdownMenuContent align="end" className="w-80 bg-card border-border">
+        <DropdownMenuLabel className="flex items-center justify-between text-foreground">
           <span>Notifications</span>
           {unreadCount > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs bg-primary/20 text-primary border-primary/30">
               {unreadCount} new
             </Badge>
           )}
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        
+        <DropdownMenuSeparator className="bg-border" />
         
         {loading ? (
           <div className="p-4 text-center text-sm text-muted-foreground">
@@ -205,19 +207,23 @@ export default function NotificationDropdown() {
               .filter((n) => !n.isRead) // hide read notifications
               .slice(0, 10)
               .map((notification) => (
-                <div key={notification.id} className="p-3 border-b last:border-b-0">
+                <div key={notification.id} className="p-3 border-b border-border last:border-b-0">
                   <div className="flex items-start space-x-3">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={notification.sender?.avatar} alt={notification.sender?.name} />
-                      <AvatarFallback>{notification.sender?.name?.charAt(0) || 'U'}</AvatarFallback>
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {notification.sender?.name?.charAt(0) || 'U'}
+                      </AvatarFallback>
                     </Avatar>
+                    
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{notification.title}</p>
+                        <p className="text-sm font-medium text-foreground">{notification.title}</p>
                         <span className="text-xs text-muted-foreground">
                           {formatTime(notification.createdAt)}
                         </span>
                       </div>
+                      
                       <p className="text-sm text-muted-foreground mt-1">
                         {notification.message}
                       </p>
@@ -227,27 +233,29 @@ export default function NotificationDropdown() {
                           <Button
                             size="sm"
                             onClick={() => handleNotificationAction(notification.id, 'accept_connection')}
-                            className="h-6 px-2 text-xs"
+                            className="h-6 px-2 text-xs bg-primary text-primary-foreground hover:opacity-90"
                             disabled={actionLoadingId === notification.id}
                           >
                             <Check className="h-3 w-3 mr-1" />
                             {actionLoadingId === notification.id ? 'Working...' : 'Accept'}
                           </Button>
+                          
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleNotificationAction(notification.id, 'reject_connection')}
-                            className="h-6 px-2 text-xs"
+                            className="h-6 px-2 text-xs border-border text-foreground hover:bg-primary/10 hover:text-primary"
                             disabled={actionLoadingId === notification.id}
                           >
                             <X className="h-3 w-3 mr-1" />
                             Decline
                           </Button>
+                          
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleChat(notification.sender?.id || '')}
-                            className="h-6 px-2 text-xs"
+                            className="h-6 px-2 text-xs text-foreground hover:text-primary hover:bg-primary/10"
                           >
                             <MessageSquare className="h-3 w-3 mr-1" />
                             Chat
@@ -260,27 +268,29 @@ export default function NotificationDropdown() {
                           <Button
                             size="sm"
                             onClick={() => handleTeamJoinAction(notification, true)}
-                            className="h-6 px-2 text-xs"
+                            className="h-6 px-2 text-xs bg-primary text-primary-foreground hover:opacity-90"
                             disabled={actionLoadingId === notification.id}
                           >
                             <Check className="h-3 w-3 mr-1" />
                             {actionLoadingId === notification.id ? 'Working...' : 'Approve'}
                           </Button>
+                          
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleTeamJoinAction(notification, false)}
-                            className="h-6 px-2 text-xs"
+                            className="h-6 px-2 text-xs border-border text-foreground hover:bg-primary/10 hover:text-primary"
                             disabled={actionLoadingId === notification.id}
                           >
                             <X className="h-3 w-3 mr-1" />
                             Decline
                           </Button>
+                          
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleChat(notification.sender?.id || '')}
-                            className="h-6 px-2 text-xs"
+                            className="h-6 px-2 text-xs text-foreground hover:text-primary hover:bg-primary/10"
                           >
                             <MessageSquare className="h-3 w-3 mr-1" />
                             Chat
@@ -291,18 +301,18 @@ export default function NotificationDropdown() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-          
-          {notifications.length > 10 && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-center text-sm text-muted-foreground">
-                View all notifications
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  } 
+          </div>
+        )}
+        
+        {notifications.length > 10 && (
+          <>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem className="text-center text-sm text-muted-foreground hover:text-primary hover:bg-primary/10">
+              View all notifications
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

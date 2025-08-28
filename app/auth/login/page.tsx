@@ -73,19 +73,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 sticky top-0 z-50">
+      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-lg">🦄</span>
-            </div>
-            <span className="text-xl font-mono font-bold">Unicorn Tank</span>
+          <div className="flex items-center space-x-1">
+            <img 
+              src="/crystul.png" 
+              alt="Crystul Logo" 
+              className="w-10 h-10 object-contain"
+            />
+            <span className="text-2xl font-mono font-bold text-primary">Crystul</span>
           </div>
           <Link href="/">
-            <Button variant="ghost" size="sm">
-              <Home className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="text-foreground hover:text-primary hover:bg-primary/10">
+              <Home className="h-6 w-6" />
             </Button>
           </Link>
         </div>
@@ -93,18 +95,20 @@ export default function LoginPage() {
 
       {/* Login Form */}
       <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-4">
-        <Card className="w-full max-w-md shadow-xl">
+        <Card className="w-full max-w-md shadow-xl border-border bg-card/50">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🦄</span>
-              </div>
-              <span className="text-2xl font-mono font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Unicorn Tank
+              <img 
+                src="/crystul.png" 
+                alt="Crystul Logo" 
+                className="w-10 h-10 object-contain"
+              />
+              <span className="text-2xl font-mono font-bold text-primary">
+                Crystul
               </span>
             </div>
-            <CardTitle className="text-2xl font-display font-bold">Welcome back</CardTitle>
-            <CardDescription className="font-sans">
+            <CardTitle className="text-2xl font-display font-bold text-foreground">Welcome back</CardTitle>
+            <CardDescription className="font-sans text-muted-foreground">
               Sign in to your account to continue building
             </CardDescription>
           </CardHeader>
@@ -113,7 +117,7 @@ export default function LoginPage() {
             {/* Google Login Button */}
             <Button
               variant="outline"
-              className="w-full font-medium"
+              className="w-full font-medium border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               onClick={handleGoogleLogin}
               disabled={isGoogleLoading}
             >
@@ -127,10 +131,10 @@ export default function LoginPage() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <Separator />
+                <Separator className="bg-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground font-sans">
+                <span className="bg-background px-2 text-primary font-sans">
                   Or continue with email
                 </span>
               </div>
@@ -139,16 +143,16 @@ export default function LoginPage() {
             {/* Email Form */}
             <form onSubmit={handleCredentialsLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-medium">Email</Label>
+                <Label htmlFor="email" className="font-medium text-foreground">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-primary" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 font-sans"
+                    className="pl-10 font-sans bg-muted/50 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                     required
                     disabled={isLoading}
                   />
@@ -156,16 +160,16 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="font-medium">Password</Label>
+                <Label htmlFor="password" className="font-medium text-foreground">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-primary" />
                   <Input
                     id="password"
                     type="password"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 font-sans"
+                    className="pl-10 font-sans bg-muted/50 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                     required
                     disabled={isLoading}
                   />
@@ -174,12 +178,12 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full font-display font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                className="w-full font-display font-semibold bg-primary text-primary-foreground hover:opacity-90"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
                     Signing in...
                   </>
                 ) : (

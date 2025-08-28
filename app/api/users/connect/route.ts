@@ -122,11 +122,11 @@ export async function POST(request: NextRequest) {
       await sendEmail({
         to: targetUser.email,
         subject: `New Connection Request from ${currentUser.name}`,
-        text: `Hello ${targetUser.name},\n\n${currentUser.name} (${currentUser.email}) wants to connect with you on Unicorn Tank. Log in to your dashboard to accept or view the request.`,
+        text: `Hello ${targetUser.name},\n\n${currentUser.name} (${currentUser.email}) wants to connect with you on Crystul. Log in to your dashboard to accept or view the request.`,
         html: `<p>Hello ${targetUser.name},</p>
-               <p><strong>${currentUser.name}</strong> (${currentUser.email}) wants to connect with you on Unicorn Tank.</p>
+               <p><strong>${currentUser.name}</strong> (${currentUser.email}) wants to connect with you on Crystul.</p>
                <p>Log in to your dashboard to accept or view the request.</p>
-               <p style="color: #888; font-size: 12px;">This is an automated notification from Unicorn Tank.</p>`,
+               <p style="color: #888; font-size: 12px;">This is an automated notification from Crystul.</p>`,
         replyTo: currentUser.email,
         fromName: currentUser.name,
       });

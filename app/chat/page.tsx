@@ -39,7 +39,9 @@ import {
   Archive,
   Trash2,
   Edit,
-  Camera
+  Camera,
+  MoreVertical,
+  User
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { storage } from '@/lib/firebase';
@@ -58,6 +60,13 @@ interface Chat {
   lastMessage: string;
   messageCount: number;
   unreadCount: number;
+  otherUser?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+    isOnline?: boolean;
+  };
 }
 
 interface Message {
@@ -72,6 +81,8 @@ interface Message {
     email: string;
     avatar?: string;
   };
+  senderId: string;
+  createdAt: string;
 }
 
 interface User {
@@ -181,7 +192,9 @@ export default function ChatPage() {
           name: session?.user?.name || 'You',
           email: session?.user?.email || '',
           avatar: session?.user?.image || ''
-        }
+        },
+        senderId: session?.user?.id || '',
+        createdAt: new Date().toISOString()
       };
 
       setMessages(prev => [...prev, optimisticMessage]);
@@ -322,7 +335,14 @@ export default function ChatPage() {
           ],
           lastMessage: data.chat.lastMessage,
           messageCount: 0,
-          unreadCount: 0
+          unreadCount: 0,
+          otherUser: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            avatar: user.avatar,
+            isOnline: false // Placeholder for online status
+          }
         });
       } else {
         toast.error('Failed to start conversation');
@@ -336,13 +356,13 @@ export default function ChatPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h1 className="text-xl font-display font-semibold text-gray-900 mb-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <h1 className="text-xl font-display font-semibold text-foreground mb-2">
             Loading Chat...
           </h1>
-          <p className="text-gray-600 font-sans">
+          <p className="text-muted-foreground font-sans">
             Please wait while we load your conversations.
           </p>
         </div>
@@ -358,30 +378,26 @@ export default function ChatPage() {
     <DashboardLayout>
       <div className="h-[calc(100vh-8rem)] flex">
         {/* Chat List */}
-        <div className="w-80 border-r border-gray-200 bg-white/80 backdrop-blur-sm">
-          <div className="p-4 border-b border-gray-200">
+        <div className="w-80 border-r border-border bg-card/80 backdrop-blur-sm">
+          <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-display font-semibold text-gray-900">Messages</h1>
+              <h1 className="text-xl font-display font-semibold text-foreground">Messages</h1>
               <div className="relative">
-                <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700 shadow-sm" onClick={() => setShowUserDropdown((v) => !v)}>
-                  <Plus className="h-4 w-4" />
+                <Button size="sm" className="bg-primary text-primary-foreground hover:opacity-90" onClick={() => setShowUserDropdown((v) => !v)}>
+                  Start New Chat
                 </Button>
                 {showUserDropdown && (
-                  <div ref={dropdownRef} className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
-                    <div className="p-3 border-b font-semibold text-gray-900">Start Conversation</div>
+                  <div ref={dropdownRef} className="absolute right-0 mt-2 w-72 bg-card border border-border rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                    <div className="p-3 border-b border-border font-semibold text-foreground">Start Conversation</div>
                     {allUsers.length === 0 ? (
-                      <div className="p-4 text-gray-500 text-sm">No users found</div>
+                      <div className="p-4 text-muted-foreground text-sm">No users found</div>
                     ) : (
                       allUsers.map((user) => (
-                        <button key={user.id} className="w-full flex items-center px-4 py-2 hover:bg-blue-50 transition" onClick={() => startConversation(user)}>
+                        <button key={user.id} className="w-full flex items-center px-4 py-2 hover:bg-primary/10 transition" onClick={() => startConversation(user)}>
                           <Avatar className="h-8 w-8 mr-3">
-                            <AvatarImage src={user.avatar} alt={user.name} />
-                            <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                            <AvatarFallback className="bg-primary text-primary-foreground">{user.name?.charAt(0)}</AvatarFallback>
                           </Avatar>
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="font-medium text-gray-900 truncate">{user.name}</div>
-                            {user.teamName && <div className="text-xs text-gray-500 truncate">{user.teamName}</div>}
-                          </div>
+                          <span className="text-foreground">{user.name}</span>
                         </button>
                       ))
                     )}
@@ -390,12 +406,12 @@ export default function ChatPage() {
               </div>
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/80 border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                className="pl-10 bg-muted/50 text-foreground border-border placeholder:text-muted-foreground focus:border-primary"
               />
             </div>
           </div>
@@ -403,16 +419,16 @@ export default function ChatPage() {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center p-8">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
             ) : filteredChats.length === 0 ? (
               <div className="text-center p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No conversations yet</h3>
-                <p className="text-gray-600 mb-4">Start connecting with other entrepreneurs</p>
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-2">No conversations yet</h3>
+                <p className="text-muted-foreground mb-4">Start connecting with other entrepreneurs</p>
+                <Button className="bg-primary text-primary-foreground hover:opacity-90">
                   Start a conversation
                 </Button>
               </div>
@@ -420,15 +436,15 @@ export default function ChatPage() {
               filteredChats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-300 ${
-                    selectedChat?.id === chat.id ? 'bg-gradient-to-r from-blue-100 to-purple-100 border-blue-200' : ''
+                  className={`p-4 border-b border-border/10 cursor-pointer hover:bg-primary/5 transition-all duration-300 ${
+                    selectedChat?.id === chat.id ? 'bg-primary/10 border-primary/20' : ''
                   }`}
                   onClick={() => setSelectedChat(chat)}
                 >
                   <div className="flex items-center space-x-3">
-                    <Avatar className="h-10 w-10 ring-2 ring-blue-100">
+                    <Avatar className="h-10 w-10 ring-2 ring-primary/20">
                       <AvatarImage src={chat.participants[0]?.avatar} alt={chat.participants[0]?.name} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold">
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                         {chat.chatType === 'team' ? (
                           <Users className="h-4 w-4" />
                         ) : (
@@ -438,22 +454,22 @@ export default function ChatPage() {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium truncate text-gray-900">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {chat.chatType === 'team' 
                             ? `Team Chat (${chat.participants.length} members)`
                             : chat.participants.find(p => p.email !== session?.user?.email)?.name || 'Unknown'
                           }
                         </p>
                         {chat.unreadCount > 0 && (
-                          <Badge variant="destructive" className="text-xs bg-red-500">
+                          <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
                             {chat.unreadCount}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-muted-foreground truncate">
                         {chat.lastMessage || 'No messages yet'}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-muted-foreground">
                         {formatTime(chat.lastMessage)}
                       </p>
                     </div>
@@ -465,16 +481,16 @@ export default function ChatPage() {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col bg-white/80 backdrop-blur-sm">
+        <div className="flex-1 flex flex-col bg-card/80 backdrop-blur-sm">
           {selectedChat ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-gray-200 bg-white/90">
+              <div className="p-4 border-b border-border bg-card/90">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <Avatar className="h-8 w-8 ring-2 ring-blue-100">
+                    <Avatar className="h-8 w-8 ring-2 ring-primary/20">
                       <AvatarImage src={selectedChat.participants[0]?.avatar} alt={selectedChat.participants[0]?.name} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold">
+                      <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                         {selectedChat.chatType === 'team' ? (
                           <Users className="h-4 w-4" />
                         ) : (
@@ -483,14 +499,9 @@ export default function ChatPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h2 className="font-semibold text-gray-900">
-                        {selectedChat.chatType === 'team' 
-                          ? `Team Chat (${selectedChat.participants.length} members)`
-                          : selectedChat.participants.find(p => p.email !== session?.user?.email)?.name || 'Unknown'
-                        }
-                      </h2>
-                      <p className="text-sm text-gray-500">
-                        {selectedChat.participants.length} participants
+                      <p className="font-medium text-foreground">{selectedChat.participants.find(p => p.email !== session?.user?.email)?.name || 'Unknown'}</p>
+                      <p className={`text-sm ${selectedChat.participants.find(p => p.email !== session?.user?.email)?.isOnline ? 'text-green-500' : 'text-muted-foreground'}`}>
+                        {selectedChat.participants.find(p => p.email !== session?.user?.email)?.isOnline ? 'Online' : 'Offline'}
                       </p>
                     </div>
                   </div>
@@ -499,30 +510,30 @@ export default function ChatPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`transition-colors ${isMuted ? 'text-red-500 hover:text-red-600 hover:bg-red-50' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'}`}
+                      className={`transition-colors ${isMuted ? 'text-red-400 hover:text-red-500 hover:bg-red-400/10' : 'text-foreground hover:text-primary hover:bg-primary/10'}`}
                     >
                       {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-600 hover:bg-blue-50">
+                    <Button variant="ghost" size="sm" className="text-foreground hover:text-primary hover:bg-primary/10">
                       <Phone className="h-4 w-4" />
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-600 hover:bg-blue-50">
+                        <Button variant="ghost" size="sm" className="text-foreground hover:text-primary hover:bg-primary/10">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-                        <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      <DropdownMenuContent align="end" className="border border-border shadow-xl bg-card/95 backdrop-blur-sm">
+                        <DropdownMenuItem className="text-foreground hover:text-primary hover:bg-primary/10">
                           <Settings className="mr-2 h-4 w-4" />
                           Chat Settings
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                        <DropdownMenuItem className="text-foreground hover:text-primary hover:bg-primary/10">
                           <Archive className="mr-2 h-4 w-4" />
                           Archive Chat
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <DropdownMenuItem className="text-red-400 hover:text-red-500 hover:bg-red-400/10">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Chat
                         </DropdownMenuItem>
@@ -536,35 +547,35 @@ export default function ChatPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <MessageSquare className="h-8 w-8 text-blue-600" />
+                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No messages yet</h3>
-                    <p className="text-gray-600">Start the conversation!</p>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No messages yet</h3>
+                    <p className="text-muted-foreground">Start the conversation!</p>
                   </div>
                 ) : (
                   messages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex items-start space-x-3 ${
-                        message.sender.email === session?.user?.email ? 'flex-row-reverse space-x-reverse' : ''
+                        message.senderId === session?.user?.id ? 'flex-row-reverse space-x-reverse' : ''
                       }`}
                     >
-                      <Avatar className="h-8 w-8 ring-1 ring-gray-200">
+                      <Avatar className="h-8 w-8 ring-1 ring-primary/20">
                         <AvatarImage src={message.sender.avatar} alt={message.sender.name} />
-                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold">
+                        <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                           {message.sender.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div
                         className={`max-w-[70%] rounded-lg px-3 py-2 shadow-sm ${
-                          message.sender.email === session?.user?.email
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
+                          message.senderId === session?.user?.id
+                            ? 'bg-gradient-to-r from-primary to-primary-dark text-primary-foreground'
+                            : 'bg-muted text-foreground'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -584,13 +595,13 @@ export default function ChatPage() {
 
               {/* Emoji Picker */}
               {showEmojiPicker && (
-                <div className="p-4 border-t border-gray-200 bg-white">
+                <div className="p-4 border-t border-border bg-card">
                   <div className="grid grid-cols-8 gap-2">
                     {emojis.map((emoji, index) => (
                       <button
                         key={index}
                         onClick={() => handleEmojiClick(emoji)}
-                        className="p-2 hover:bg-gray-100 rounded text-lg transition-colors"
+                        className="p-2 hover:bg-primary/10 rounded text-lg transition-colors"
                       >
                         {emoji}
                       </button>
@@ -600,35 +611,35 @@ export default function ChatPage() {
               )}
 
               {/* Message Input */}
-              <div className="p-4 border-t border-gray-200 bg-gray-50/50">
+              <div className="p-4 border-t border-border bg-card/50">
                 <div className="flex items-center space-x-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-600 hover:text-blue-600 hover:bg-blue-50">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-foreground hover:text-primary hover:bg-primary/10">
                         <Plus className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-                      <DropdownMenuLabel className="text-gray-900">Add to chat</DropdownMenuLabel>
+                    <DropdownMenuContent align="start" className="border border-border shadow-xl bg-card/95 backdrop-blur-sm">
+                      <DropdownMenuLabel className="text-foreground">Add to chat</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => document.getElementById('file-upload')?.click()} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      <DropdownMenuItem onClick={() => document.getElementById('file-upload')?.click()} className="text-foreground hover:text-primary hover:bg-primary/10">
                         <File className="mr-2 h-4 w-4" />
                         Document
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => document.getElementById('file-upload')?.click()} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      <DropdownMenuItem onClick={() => document.getElementById('file-upload')?.click()} className="text-foreground hover:text-primary hover:bg-primary/10">
                         <Image className="mr-2 h-4 w-4" />
                         Photo
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => document.getElementById('file-upload')?.click()} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      <DropdownMenuItem onClick={() => document.getElementById('file-upload')?.click()} className="text-foreground hover:text-primary hover:bg-primary/10">
                         <Video className="mr-2 h-4 w-4" />
                         Video
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      <DropdownMenuItem className="text-foreground hover:text-primary hover:bg-primary/10">
                         <Users className="mr-2 h-4 w-4" />
                         Create Group
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      <DropdownMenuItem className="text-foreground hover:text-primary hover:bg-primary/10">
                         <Phone className="mr-2 h-4 w-4" />
                         Voice Call
                       </DropdownMenuItem>
@@ -639,7 +650,7 @@ export default function ChatPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="h-8 w-8 p-0 text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    className="h-8 w-8 p-0 text-foreground hover:text-primary hover:bg-primary/10"
                   >
                     <Smile className="h-4 w-4" />
                   </Button>
@@ -648,7 +659,7 @@ export default function ChatPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => document.getElementById('file-upload')?.click()}
-                    className="h-8 w-8 p-0 text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    className="h-8 w-8 p-0 text-foreground hover:text-primary hover:bg-primary/10"
                   >
                     <Paperclip className="h-4 w-4" />
                   </Button>
@@ -658,14 +669,14 @@ export default function ChatPage() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type a message..."
-                    className="flex-1 bg-white text-black font-display"
+                    className="flex-1 bg-background text-foreground font-display border-border focus:border-primary"
                     disabled={loading}
                   />
 
                   <Button
                     onClick={sendMessage}
                     disabled={!newMessage.trim() || loading}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-sm"
+                    className="bg-primary text-primary-foreground hover:opacity-90"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
@@ -684,11 +695,11 @@ export default function ChatPage() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a conversation</h3>
-                <p className="text-gray-600">Choose a chat from the list to start messaging</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Select a conversation</h3>
+                <p className="text-muted-foreground">Choose a chat from the list to start messaging</p>
               </div>
             </div>
           )}

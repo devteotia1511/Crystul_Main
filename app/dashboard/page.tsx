@@ -1,187 +1,159 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import DashboardLayout from '@/components/dashboard-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, MessageSquare, Target, Plus, TrendingUp, Calendar, Bell, Loader2, ArrowRight, Users2, Building2 } from 'lucide-react';
-import Link from 'next/link';
-import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Users, 
+  Target, 
+  TrendingUp, 
+  Calendar, 
+  Plus, 
+  Search, 
+  MessageCircle, 
+  Star,
+  Building2,
+  User,
+  Loader2
+} from "lucide-react";
+import Link from "next/link";
+import DashboardLayout from "@/components/dashboard-layout";
 
 interface Team {
   id: string;
   name: string;
   description: string;
-  founderId: string;
-  members: any[];
-  openRoles: string[];
-  stage: string;
-  industry: string;
-  isPublic: boolean;
-  createdAt: string;
+  members: number;
+  skills: string[];
+  lookingFor: string[];
 }
 
 interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
   skills: string[];
-  interests: string[];
   experience: string;
-  bio?: string;
-  location?: string;
-  compatibility: number;
+  avatar?: string;
 }
 
-interface DashboardStats {
-  teamsCount: number;
-  matchesCount: number;
-  messagesCount: number;
-  unreadMessagesCount: number;
-  tasksCount: number;
-  tasksDueToday: number;
+interface Activity {
+  id: string;
+  type: 'team_created' | 'member_joined' | 'project_started';
+  description: string;
+  timestamp: string;
+  user: string;
 }
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [matches, setMatches] = useState<User[]>([]);
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [connectingUsers, setConnectingUsers] = useState<Set<string>>(new Set());
-  const ROLE_OPTIONS = [
-    'Technical Co-founder', 'Business Co-founder', 'CTO', 'CMO', 'CFO',
-    'Head of Product', 'Head of Marketing', 'Head of Sales', 'Head of Design',
-    'Backend Developer', 'Frontend Developer', 'Full Stack Developer',
-    'Mobile Developer', 'UI/UX Designer', 'Data Scientist', 'DevOps Engineer'
-  ];
-  const [selectedSkill, setSelectedSkill] = useState<string>('all');
+  const [potentialMatches, setPotentialMatches] = useState<User[]>([]);
+  const [recentActivity, setRecentActivity] = useState<Activity[]>([]);
+  const [selectedSkill, setSelectedSkill] = useState<string>("all");
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push('/auth/login');
+      router.push("/auth/login");
+      return;
+    }
+
+    if (status === "authenticated") {
+      // Simulate loading data
+      setTimeout(() => {
+        setIsLoading(false);
+        // Mock data
+        setTeams([
+          {
+            id: "1",
+            name: "TechFlow",
+            description: "Building the next generation of workflow automation tools",
+            members: 3,
+            skills: ["React", "Node.js", "AI/ML"],
+            lookingFor: ["DevOps Engineer", "UI/UX Designer"]
+          },
+          {
+            id: "2",
+            name: "EcoCart",
+            description: "Sustainable shopping platform for eco-conscious consumers",
+            members: 2,
+            skills: ["Python", "React Native", "Blockchain"],
+            lookingFor: ["Marketing Specialist", "Backend Developer"]
+          }
+        ]);
+
+        setPotentialMatches([
+          {
+            id: "1",
+            name: "Sarah Chen",
+            email: "sarah@example.com",
+            skills: ["DevOps", "AWS", "Docker"],
+            experience: "5+ years in cloud infrastructure"
+          },
+          {
+            id: "2",
+            name: "Marcus Johnson",
+            email: "marcus@example.com",
+            skills: ["UI/UX Design", "Figma", "Prototyping"],
+            experience: "3+ years in product design"
+          }
+        ]);
+
+        setRecentActivity([
+          {
+            id: "1",
+            type: "team_created",
+            description: "Created new team 'TechFlow'",
+            timestamp: "2 hours ago",
+            user: "You"
+          },
+          {
+            id: "2",
+            type: "member_joined",
+            description: "Alex joined 'EcoCart' team",
+            timestamp: "1 day ago",
+            user: "Alex"
+          }
+        ]);
+      }, 1000);
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (status === "authenticated" && session) {
-      fetchDashboardData(selectedSkill);
-    }
-  }, [status, session, selectedSkill]);
-
-  const fetchDashboardData = async (skillFilter?: string) => {
-    try {
-      setLoading(true);
-      let teamsUrl = '/api/teams';
-      if (skillFilter && skillFilter !== 'all') {
-        teamsUrl += `?skills=${encodeURIComponent(skillFilter)}`;
-      }
-      const teamsResponse = await fetch(teamsUrl);
-      const teamsData = await teamsResponse.json();
-      
-      if (teamsData.success) {
-        setTeams(teamsData.teams);
-      }
-
-      // Fetch matches
-      const matchesResponse = await fetch('/api/users/matches');
-      const matchesData = await matchesResponse.json();
-      
-      if (matchesData.success) {
-        setMatches(matchesData.matches);
-      }
-
-      // Fetch stats
-      const statsResponse = await fetch('/api/dashboard/stats');
-      const statsData = await statsResponse.json();
-      
-      if (statsData.success) {
-        setStats(statsData.stats);
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConnect = async (userId: string) => {
-    try {
-      setConnectingUsers(prev => new Set(prev).add(userId));
-      
-      const response = await fetch('/api/users/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ targetUserId: userId }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('Connection request sent successfully!');
-        // Optionally refresh matches to update the UI
-        fetchDashboardData();
-      } else {
-        toast.error(data.message || 'Failed to send connection request');
-      }
-    } catch (error) {
-      console.error('Error connecting with user:', error);
-      toast.error('Failed to send connection request');
-    } finally {
-      setConnectingUsers(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(userId);
-        return newSet;
-      });
-    }
-  };
-
-  // Show loading while session is being determined
-  if (status === "loading") {
+  if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h1 className="text-xl font-display font-semibold text-gray-900 mb-2">
-            Loading Dashboard...
-          </h1>
-          <p className="text-gray-600 font-sans">
-            Please wait while we load your dashboard.
-          </p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Redirect if not authenticated
   if (status === "unauthenticated") {
-    return null;
-  }
-
-  // If no session, show error
-  if (!session) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-display font-bold text-gray-900 mb-4">
-            Authentication Required
-          </h1>
-          <p className="text-gray-600 mb-4 font-sans">
-            Please sign in to access your dashboard.
-          </p>
-          <Button onClick={() => router.push('/auth/login')} className="font-medium">
-            Sign In
-          </Button>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Please sign in to continue</h2>
+          <p className="text-muted-foreground mb-6">You need to be authenticated to view this page</p>
+          <Link href="/auth/login">
+            <Button className="bg-primary text-primary-foreground">
+              Sign In
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -191,345 +163,252 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Welcome Section */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-serif text-gray-700 font-semibold">
-              Welcome back, {session.user?.name || 'User'}!
-            </h1>
-            <p className="text-gray-600 mt-1 font-sans">
-              Here's what's happening with your teams today
-            </p>
-          </div>
-          <Button asChild className="font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
+        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-6">
+          <h1 className="text-3xl font-display font-bold text-foreground mb-2">
+            Welcome back, {session?.user?.name || "Entrepreneur"}! 👋
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Ready to build something amazing? Let's get your team together.
+          </p>
+          <div className="mt-6">
             <Link href="/teams/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Team
+              <Button className="bg-primary text-primary-foreground hover:opacity-90">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Team
+              </Button>
             </Link>
-          </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-display font-medium text-gray-700">Your Teams</CardTitle>
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-4 w-4 text-blue-600" />
-              </div>
+              <CardTitle className="text-sm font-medium text-foreground">Total Teams</CardTitle>
+              <Users className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                  <span className="text-sm text-gray-500">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  <div className="text-2xl font-display font-bold text-gray-900">{stats?.teamsCount || 0}</div>
-                  <p className="text-xs text-gray-500 font-sans">
-                    Active teams
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-display font-medium text-gray-700">Matches Found</CardTitle>
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="h-4 w-4 text-green-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-green-600" />
-                  <span className="text-sm text-gray-500">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  <div className="text-2xl font-display font-bold text-gray-900">{stats?.matchesCount || 0}</div>
-                  <p className="text-xs text-gray-500 font-sans">
-                    Potential matches
-                  </p>
-                </>
-              )}
+              <div className="text-2xl font-bold text-primary">{teams.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Active teams you're part of
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-display font-medium text-gray-700">Messages</CardTitle>
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <MessageSquare className="h-4 w-4 text-purple-600" />
-              </div>
+              <CardTitle className="text-sm font-medium text-foreground">Team Members</CardTitle>
+              <Target className="h-4 w-4 text-secondary-foreground" />
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
-                  <span className="text-sm text-gray-500">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  <div className="text-2xl font-display font-bold text-gray-900">{stats?.messagesCount || 0}</div>
-                  <p className="text-xs text-gray-500 font-sans">
-                    {stats?.unreadMessagesCount || 0} unread messages
-                  </p>
-                </>
-              )}
+              <div className="text-2xl font-bold text-secondary-foreground">
+                {teams.reduce((acc, team) => acc + team.members, 0)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total team members across all teams
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-display font-medium text-gray-700">Tasks</CardTitle>
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Target className="h-4 w-4 text-orange-600" />
-              </div>
+              <CardTitle className="text-sm font-medium text-foreground">Potential Matches</CardTitle>
+              <TrendingUp className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-orange-600" />
-                  <span className="text-sm text-gray-500">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  <div className="text-2xl font-display font-bold text-gray-900">{stats?.tasksCount || 0}</div>
-                  <p className="text-xs text-gray-500 font-sans">
-                    {stats?.tasksDueToday || 0} due today
-                  </p>
-                </>
-              )}
+              <div className="text-2xl font-bold text-primary">{potentialMatches.length}</div>
+              <p className="text-xs text-muted-foreground">
+                People matching your criteria
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Skills Filter Dropdown */}
-        <div className="mb-6 max-w-xs">
-          <Select value={selectedSkill} onValueChange={(value) => setSelectedSkill(value)}>
-            <SelectTrigger className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
-              <SelectValue placeholder="Filter by Skill (Open Role)" />
+        {/* Skills Filter */}
+        <div className="flex items-center space-x-4">
+          <span className="text-foreground font-medium">Filter by skill:</span>
+          <Select value={selectedSkill} onValueChange={setSelectedSkill}>
+            <SelectTrigger className="w-[200px] bg-primary text-primary-foreground hover:opacity-90">
+              <SelectValue placeholder="Select skill" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Skills</SelectItem>
-              {ROLE_OPTIONS.map((role) => (
-                <SelectItem key={role} value={role}>{role}</SelectItem>
-              ))}
+            <SelectContent className="bg-card border-border">
+              <SelectItem value="all" className="text-foreground hover:bg-primary/10">All Skills</SelectItem>
+              <SelectItem value="react" className="text-foreground hover:bg-primary/10">React</SelectItem>
+              <SelectItem value="node" className="text-foreground hover:bg-primary/10">Node.js</SelectItem>
+              <SelectItem value="ai" className="text-foreground hover:bg-primary/10">AI/ML</SelectItem>
+              <SelectItem value="design" className="text-foreground hover:bg-primary/10">UI/UX Design</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* All Teams Section (now first, grid-cols-2) */}
-        <div>
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Building2 className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="font-display font-semibold text-gray-900">All Teams</CardTitle>
-                    <CardDescription className="font-sans text-gray-600">
-                      Teams you've created or joined
-                    </CardDescription>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/teams">
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+        {/* Teams and Matches Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* All Teams */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-display font-semibold text-foreground">All Teams</h2>
+              <Link href="/teams">
+                <Button variant="ghost" className="text-primary hover:text-foreground hover:bg-primary/10">
+                  View All
                 </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                </div>
-              ) : teams.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users2 className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No teams yet</h3>
-                  <p className="text-gray-600 mb-4 font-sans">Start building your dream team today</p>
-                  <Button asChild className="bg-gradient-to-r from-blue-600  to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                    <Link href="/teams/create">Create Your First Team</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {teams.map((team) => (
-                    <div key={team.id} className="group p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 bg-white/50">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center p-4">
-                              <span className="text-white font-bold text-sm">{team.name.charAt(0)}</span>
-                            </div>
-                            <div>
-                              <h3 className="font-display font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                {team.name}
-                              </h3>
-                              <p className="text-sm text-gray-600 font-sans line-clamp-2">
-                                {team.description}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 mt-3">
-                            <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
-                              {team.stage}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs text-slate-600 font-mono">
-                              {team.industry}
-                            </Badge>
-                            <span className="text-xs text-gray-500 font-sans flex items-center">
-                              <Users2 className="h-3 w-3 mr-1" />
-                              {team.members.length} members
-                            </span>
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link href={`/teams/${team.id}`}>
-                            <ArrowRight className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </Link>
+            </div>
 
-        {/* Potential Matches Section (now below) */}
-        <div>
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="font-display font-semibold text-gray-900">Potential Matches</CardTitle>
-                    <CardDescription className="font-sans text-gray-600">
-                      Entrepreneurs that match your profile
-                    </CardDescription>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/explore">
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-green-600" />
-                </div>
-              ) : matches.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No matches found yet</h3>
-                  <p className="text-gray-600 mb-4 font-sans">Complete your profile to find better matches</p>
-                  <Button asChild className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
-                    <Link href="/explore">Explore Users</Link>
+            {teams.length === 0 ? (
+              <Card className="bg-card/50 border-border text-center py-8">
+                <Building2 className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No teams yet</h3>
+                <p className="text-muted-foreground mb-4">Start building your dream team today!</p>
+                <Link href="/teams/create">
+                  <Button className="bg-primary text-primary-foreground hover:opacity-90">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Your First Team
                   </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {matches.slice(0, 6).map((user) => (
-                    <div key={user.id} className="group p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all duration-200 bg-white/50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={user.avatar} alt={user.name} />
-                            <AvatarFallback className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
-                              {user.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <h3 className="font-display font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
-                              {user.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 font-sans">
-                              {user.skills.slice(0, 2).join(', ')}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs bg-green-100 text-green-700 border-green-200">
-                                {user.compatibility}% match
+                </Link>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {teams.map((team) => (
+                  <Card key={team.id} className="bg-card/50 border-border hover:border-primary hover:shadow-md transition-all duration-200">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-foreground">{team.name}</CardTitle>
+                          <CardDescription className="text-muted-foreground">{team.description}</CardDescription>
+                        </div>
+                        <Badge className="bg-primary/20 text-primary border-primary/30">
+                          {team.members} members
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-2">Skills:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {team.skills.map((skill) => (
+                              <Badge key={skill} variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+                                {skill}
                               </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                {user.experience}
-                              </Badge>
-                            </div>
+                            ))}
                           </div>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 text-white hover:bg-green-700"
-                          onClick={() => handleConnect(user.id)}
-                          disabled={connectingUsers.has(user.id)}
-                        >
-                          {connectingUsers.has(user.id) ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Connecting...
-                            </>
-                          ) : (
-                            'Connect'
-                          )}
-                        </Button>
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-2">Looking for:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {team.lookingFor.map((role) => (
+                              <Badge key={role} variant="outline" className="border-primary/30 text-primary">
+                                {role}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {matches.length > 6 && (
-                <Button variant="outline" className="w-full font-display font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:text-white shadow-lg hover:bg-black-50" asChild>
-                  <Link href="/explore">View All Matches</Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Potential Matches */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-display font-semibold text-foreground">Potential Matches</h2>
+              <Link href="/explore">
+                <Button variant="ghost" className="text-primary hover:text-foreground hover:bg-primary/10">
+                  Explore More
                 </Button>
-              )}
-            </CardContent>
-          </Card>
+              </Link>
+            </div>
+
+            {potentialMatches.length === 0 ? (
+              <Card className="bg-card/50 border-border text-center py-8">
+                <User className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No matches found</h3>
+                <p className="text-muted-foreground mb-4">Try adjusting your search criteria</p>
+                <Link href="/explore">
+                  <Button className="bg-primary text-primary-foreground hover:opacity-90">
+                    <Search className="mr-2 h-4 w-4" />
+                    Explore Users
+                  </Button>
+                </Link>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {potentialMatches.map((user) => (
+                  <Card key={user.id} className="bg-card/50 border-border hover:border-primary hover:shadow-md transition-all duration-200">
+                    <CardHeader>
+                      <div className="flex items-start space-x-4">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={user.avatar} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {user.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <CardTitle className="text-foreground">{user.name}</CardTitle>
+                          <CardDescription className="text-muted-foreground">{user.experience}</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-2">Skills:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {user.skills.map((skill) => (
+                              <Badge key={skill} variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+                                {skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/80 border-secondary">
+                            <MessageCircle className="mr-2 h-3 w-3" />
+                            Connect
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
+                            <Star className="mr-2 h-3 w-3" />
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Recent Activity */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card/50 border-border">
           <CardHeader>
-            <div className="flex items-center space-x-2">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Bell className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <CardTitle className="font-display font-semibold text-gray-900">Recent Activity</CardTitle>
-                <CardDescription className="font-sans text-gray-600">
-                  Latest updates from your teams and network
-                </CardDescription>
-              </div>
-            </div>
+            <CardTitle className="text-foreground flex items-center">
+              <Calendar className="mr-2 h-5 w-5 text-primary" />
+              Recent Activity
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bell className="h-8 w-8 text-orange-600" />
+            {recentActivity.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">No recent activity</p>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30 border border-border">
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-foreground text-sm">
+                        <span className="font-medium">{activity.user}</span> {activity.description}
+                      </p>
+                      <p className="text-muted-foreground text-xs">{activity.timestamp}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No recent activity</h3>
-              <p className="text-gray-600 font-sans">Activity will appear here as you interact with teams</p>
-              <p className="text-sm text-gray-500 font-sans mt-2">
-                Start by creating a team or connecting with other entrepreneurs
-              </p>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

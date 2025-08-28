@@ -22,7 +22,7 @@ export async function verifyEmailTransport(): Promise<void> {
 
 export async function sendEmail({ to, subject, html, text, replyTo, fromName }: { to: string; subject: string; html?: string; text?: string; replyTo?: string; fromName?: string }) {
   const defaultFrom = process.env.SMTP_FROM || process.env.SMTP_USER || '';
-  const friendlyFrom = fromName ? `${fromName} via Unicorn Tank <${defaultFrom}>` : defaultFrom;
+  const friendlyFrom = fromName ? `${fromName} via Crystul <${defaultFrom}>` : defaultFrom;
 
   const mailOptions = {
     from: friendlyFrom,

@@ -1,4 +1,4 @@
-# 🦄 Unicorn Tank
+# 🦄 Crystul
 
 A modern team collaboration platform built with Next.js, Firebase, MongoDB, and Paytm integration.
 
@@ -263,5 +263,5 @@ Provider tips:
 - Mailtrap (testing): use the SMTP credentials from your Mailtrap inbox; emails are captured in Mailtrap.
 - SendGrid: `SMTP_HOST=smtp.sendgrid.net`, `SMTP_USER=apikey`, `SMTP_PASS=<your-sendgrid-api-key>`, and `SMTP_FROM` must be a verified sender.
 
-The app sends as: `Sender Name via Unicorn Tank <SMTP_FROM>` and sets `Reply-To` to the actual sender's email so replies go directly to them.
+The app sends as: `Sender Name via Crystul <SMTP_FROM>` and sets `Reply-To` to the actual sender's email so replies go directly to them.
 

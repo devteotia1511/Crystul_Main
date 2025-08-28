@@ -90,13 +90,13 @@ export default function ExplorePage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <h1 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <h1 className="text-xl font-display font-semibold text-foreground mb-2">
             Loading Explore...
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 font-sans">
+          <p className="text-muted-foreground font-sans">
             Please wait while we load the explore page.
           </p>
         </div>
@@ -115,26 +115,26 @@ export default function ExplorePage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 font-serif p-3">
+            <h1 className="text-3xl font-bold text-primary font-serif p-3">
               Explore
             </h1>
-            <p className="text-gray-600 dark:text-gray-500 mt-1 mx-3 font-sans">
+            <p className="text-muted-foreground mt-1 mx-3 font-sans">
               Discover entrepreneurs and teams that match your interests
             </p>
           </div>
         </div>
 
         {/* Search Bar */}
-        <Card className='bg-gradient-to-r from-gray-600 via-gray-500 to-gray-400 text-white'>
+        <Card className='bg-card/50 border-border'>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Search className="h-5 w-5 text-muted-foreground" />
+              <Search className="h-5 w-5 text-primary" />
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search for entrepreneurs, skills, teams, or interests..."
-                className="flex-1 bg-transparent border-none outline-none text-sm"
+                className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
               />
             </div>
           </CardContent>
@@ -142,27 +142,27 @@ export default function ExplorePage() {
 
         {/* Teams Section */}
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Teams</h2>
+          <h2 className="text-2xl font-bold mb-4 text-foreground">Teams</h2>
           {filteredTeams.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No teams found.</div>
+            <div className="text-center py-8 text-muted-foreground">No teams found.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredTeams.map((team: Team) => (
-                <Card key={team.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white h-56 flex flex-col">
+                <Card key={team.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-card/50 border-border text-foreground h-56 flex flex-col hover:border-primary/40">
                   <CardHeader className="pb-1 p-3">
-                    <CardTitle className="font-display font-semibold font-2xl font-serif">{team.name}</CardTitle>
-                    <CardDescription className="font-sans text-gray-400">{team.industry}</CardDescription>
+                    <CardTitle className="font-display font-semibold font-2xl font-serif text-foreground">{team.name}</CardTitle>
+                    <CardDescription className="font-sans text-muted-foreground">{team.industry}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col p-3 pt-0 min-h-0">
-                    <div className="mb-2 text-sm line-clamp-2 overflow-hidden">{team.description}</div>
+                    <div className="mb-2 text-sm line-clamp-2 overflow-hidden text-muted-foreground">{team.description}</div>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {team.openRoles && team.openRoles.map((role: string, idx: number) => (
-                        <Badge key={idx} variant="outline" className="bg-slate-600 text-white-500">{role}</Badge>
+                        <Badge key={idx} variant="outline" className="bg-primary/20 text-primary border-primary/30">{role}</Badge>
                       ))}
                     </div>
-                    <div className="text-xs text-gray-300">Stage: {team.stage}</div>
+                    <div className="text-xs text-muted-foreground">Stage: {team.stage}</div>
                     <div className="mt-auto pt-2">
-                      <Link href={`/teams/${team.id}`} className="text-blue-300 underline">View Team</Link>
+                      <Link href={`/teams/${team.id}`} className="text-primary underline hover:text-primary/80">View Team</Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -173,36 +173,36 @@ export default function ExplorePage() {
 
         {/* Users Section */}
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Entrepreneurs</h2>
+          <h2 className="text-2xl font-bold mb-4 text-foreground">Entrepreneurs</h2>
           {filteredUsers.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No users found.</div>
+            <div className="text-center py-8 text-muted-foreground">No users found.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredUsers.map((user: User) => (
-                <Card key={user.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-r from-gray-600 via-gray-500 to-gray-400 text-white">
+                <Card key={user.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-card/50 border-border text-foreground hover:border-primary/40">
                   <CardHeader className="flex flex-row items-center gap-3">
                     <Avatar>
                       <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback className='bg-gray-700'>{user.name?.[0]}</AvatarFallback>
+                      <AvatarFallback className='bg-primary text-primary-foreground'>{user.name?.[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <CardTitle className="font-display font-semibold">{user.name}</CardTitle>
-                      <CardDescription className="font-sans">{user.location}</CardDescription>
+                      <CardTitle className="font-display font-semibold text-foreground">{user.name}</CardTitle>
+                      <CardDescription className="font-sans text-muted-foreground">{user.location}</CardDescription>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-2 text-sm">{user.bio}</div>
+                    <div className="mb-2 text-sm text-muted-foreground">{user.bio}</div>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {user.skills && user.skills.map((skill: string, idx: number) => (
-                        <Badge key={idx} variant="outline" className="bg-slate-600">{skill}</Badge>
+                        <Badge key={idx} variant="outline" className="bg-primary/20 text-primary border-primary/30">{skill}</Badge>
                       ))}
                     </div>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {user.interests && user.interests.map((interest: string, idx: number) => (
-                        <Badge key={idx} variant="outline" className="bg-emerald-700">{interest}</Badge>
+                        <Badge key={idx} variant="outline" className="bg-secondary/20 text-secondary-foreground border-secondary/30">{interest}</Badge>
                       ))}
                     </div>
-                    <div className="text-xs text-gray-300">Experience: {user.experience}</div>
+                    <div className="text-xs text-muted-foreground">Experience: {user.experience}</div>
                   </CardContent>
                 </Card>
               ))}
