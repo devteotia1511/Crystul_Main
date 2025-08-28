@@ -91,6 +91,7 @@ interface User {
   email: string;
   avatar?: string;
   teamName?: string;
+  isOnline?: boolean;
 }
 
 export default function ChatPage() {
@@ -499,11 +500,17 @@ export default function ChatPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-foreground">{selectedChat.participants.find(p => p.email !== session?.user?.email)?.name || 'Unknown'}</p>
-                      <p className={`text-sm ${selectedChat.participants.find(p => p.email !== session?.user?.email)?.isOnline ? 'text-green-500' : 'text-muted-foreground'}`}>
-                        {selectedChat.participants.find(p => p.email !== session?.user?.email)?.isOnline ? 'Online' : 'Offline'}
-                      </p>
-                    </div>
+                    <p className="font-medium text-foreground">
+                      {selectedChat.otherUser?.name || 'Unknown'}
+                    </p>
+                    <p
+                      className={`text-sm ${
+                        selectedChat.otherUser?.isOnline ? 'text-green-500' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {selectedChat.otherUser?.isOnline ? 'Online' : 'Offline'}
+                    </p>
+                  </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
