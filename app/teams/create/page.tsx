@@ -134,7 +134,7 @@ export default function CreateTeamPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Create Your Team</CardTitle>
             <CardDescription>
-              Set up your startup team and define the roles you're looking to fill
+              Set up your startup team and define the roles you&apos;re looking to fill
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -209,7 +209,7 @@ export default function CreateTeamPage() {
 
                 <Select onValueChange={addRole}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Add roles you're looking for" />
+                    <SelectValue placeholder="Add roles you&apos;re looking for" />
                   </SelectTrigger>
                   <SelectContent>
                     {ROLE_OPTIONS.filter(role => !openRoles.includes(role)).map((role) => (

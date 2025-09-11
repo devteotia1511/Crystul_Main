@@ -35,7 +35,6 @@ import {
   LogOut,
   MessageSquare,
   Bot,
-  DollarSign,
   UserPlus
 } from 'lucide-react';
 import NotificationDropdown from './notification-dropdown';
@@ -49,7 +48,6 @@ const navigationLinks = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
   { href: '/ai-assistant', label: 'AI Assistant', icon: Bot },
   { href: '/connect-founders', label: 'Connect', icon: UserPlus },
-  { href: '/pricing', label: 'Pricing', icon: DollarSign },
 ];
 
 export default function DashboardNavbar() {

@@ -168,7 +168,7 @@ export default function DashboardPage() {
             Welcome back, {session?.user?.name || "Entrepreneur"}! 👋🏻
           </h1>
           <p className="text-muted-foreground text-lg">
-            Ready to build something amazing? Let's get your team together.
+            Ready to build something amazing? Let&apos;s get your team together.
           </p>
           <div className="mt-6">
             <Link href="/teams/create">
@@ -190,7 +190,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold text-primary">{teams.length}</div>
               <p className="text-xs text-muted-foreground">
-                Active teams you're part of
+                Active teams you&apos;re part of
               </p>
             </CardContent>
           </Card>

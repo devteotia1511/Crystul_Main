@@ -117,8 +117,8 @@ export default function HomePage() {
             <Link href="/explore">
               <span className="text-foreground hover:text-primary font-heading transition-colors font-medium">Explore</span>
             </Link>
-            <Link href="/pricing">
-              <span className="text-foreground hover:text-primary font-heading transition-colors font-medium">Pricing</span>
+            <Link href="/promotions">
+              <span className="text-foreground hover:text-primary font-heading transition-colors font-medium">Promotions</span>
             </Link>
           </div>
 
@@ -157,7 +157,7 @@ export default function HomePage() {
                   <Link href="/explore">Explore Teams</Link>
                 </DropdownMenuItem>
                   <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10">
-                    <Link href="/pricing">Pricing</Link>
+                    <Link href="/promotions">Promotions</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10">
                   <Link href="/auth/login">Sign In</Link>
@@ -213,9 +213,9 @@ export default function HomePage() {
                     Start Building <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
-                <Link href="/pricing">
+                <Link href="/promotions">
                 <Button size="lg" variant="outline" className="text-lg px-8 py-6 font-display font-medium text-foreground border-primary hover:bg-primary hover:text-primary-foreground">
-                    View Pricing
+                    View Promotions
                   </Button>
                 </Link>
               </div>

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Users, Target, Settings, Plus, Crown, Calendar, Loader2 } from 'lucide-react';
+import { MessageSquare, Users, Target, Settings, Plus, Crown, Calendar, Loader2, Bell } from 'lucide-react';
 import TeamChat from '@/components/team-chat';
 import TeamTasks from '@/components/team-tasks';
 import Link from 'next/link';
@@ -249,7 +249,7 @@ export default function TeamDetailPage() {
             Team Not Found
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            The team you're looking for doesn't exist or you don't have access to it.
+            The team you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.
           </p>
           <Button asChild>
             <Link href="/dashboard">Back to Dashboard</Link>
@@ -416,7 +416,7 @@ export default function TeamDetailPage() {
           <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-all duration-200 hover:border-primary/40">
             <CardHeader>
               <CardTitle className="text-foreground">Open Roles</CardTitle>
-              <CardDescription className="text-muted-foreground">Positions we're looking to fill</CardDescription>
+              <CardDescription className="text-muted-foreground">Positions we&apos;re looking to fill</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">

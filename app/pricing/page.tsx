@@ -247,7 +247,7 @@ export default function PricingPage() {
               Ready to Build Your Dream Team?
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of entrepreneurs who've found their perfect teammates
+              Join thousands of entrepreneurs who&apos;ve found their perfect teammates
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/register">

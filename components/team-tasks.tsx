@@ -92,7 +92,7 @@ export default function TeamTasks({ teamId }: TeamTasksProps) {
         <div>
           <h2 className="text-2xl font-display font-bold">Task Board</h2>
           <p className="text-muted-foreground font-sans">
-            Manage and track your team's progress
+            Manage and track your team&apos;s progress
           </p>
         </div>
         <Button 
