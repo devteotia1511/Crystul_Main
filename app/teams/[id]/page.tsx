@@ -268,163 +268,203 @@ export default function TeamDetailPage() {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Team Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center space-x-4 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 font-serif p-3">
-              <h1 className="text-3xl font-bold">
-                {team.name}
-              </h1>
-              <Badge variant="secondary">{team.stage}</Badge>
-              <Badge variant="outline" className='text-black-600'>{team.industry}</Badge>
-              {team.isPublic && <Badge variant="default">Public</Badge>}
-            </div>
-            <p className="text-black text-lg">
-              {team.description}
-            </p>
-            <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-              <div className="flex items-center text-gray-500">
-                <Users className="w-4 h-4 mr-1" />
-                {teamMembers.length + 1} members
-              </div>
-              <div className="flex items-center text-gray-500">
-                <Calendar className="w-4 h-4 mr-1 " />
-                Created {new Date(team.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            {!hasAccess && (
-              <Button className='bg-emerald-500 hover:bg-blue-400 text-white' onClick={requestToJoin} disabled={requesting}>
-                <Plus className="mr-2 h-4 w-4" />
-                {requesting ? 'Requesting...' : 'Join Team'}
-              </Button>
-            )}
-            {isFounder && (
-              <div className="flex items-center gap-2">
-                {!editing ? (
-                  <>
-                    <Button variant="outline" onClick={() => setEditing(true)}>
-                      Edit Team
-                    </Button>
-                    <Button variant="destructive" onClick={deleteTeam} disabled={deleting}>
-                      {deleting ? 'Deleting...' : 'Delete Team'}
-                    </Button>
-                  </>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <input
-                      className="border rounded px-3 py-2 text-sm"
-                      value={editForm.name}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                      placeholder="Team name"
-                    />
-                    <input
-                      className="border rounded px-3 py-2 text-sm w-64"
-                      value={editForm.description}
-                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                      placeholder="Description"
-                    />
-                    <label className="text-sm flex items-center gap-1">
-                      <input type="checkbox" checked={editForm.isPublic} onChange={(e) => setEditForm({ ...editForm, isPublic: e.target.checked })} />
-                      Public
-                    </label>
-                    <Button onClick={saveTeam} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
-                    <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
+        <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-6 mb-8">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-start space-x-4 mb-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl font-display font-bold text-foreground mb-3">
+                    {team.name}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <Badge className="bg-primary/20 text-primary border-primary/30">{team.stage}</Badge>
+                    <Badge variant="outline" className="bg-secondary/20 text-secondary-foreground border-secondary/30">{team.industry}</Badge>
+                    {team.isPublic && <Badge className="bg-primary text-primary-foreground">Public</Badge>}
                   </div>
-                )}
-                <Button variant="outline" asChild>
-                  <Link href={`/teams/${team.id}/settings`}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </Link>
-                </Button>
+                </div>
               </div>
-            )}
+              <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
+                {team.description}
+              </p>
+              <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center text-muted-foreground">
+                  <Users className="w-4 h-4 mr-2 text-primary" />
+                  <span className="font-medium text-foreground">{teamMembers.length + 1}</span> members
+                </div>
+                <div className="flex items-center text-muted-foreground">
+                  <Calendar className="w-4 h-4 mr-2 text-primary" />
+                  Created <span className="font-medium text-foreground">{new Date(team.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              {!hasAccess && (
+                <Button className="bg-primary text-primary-foreground hover:opacity-90" onClick={requestToJoin} disabled={requesting}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {requesting ? 'Requesting...' : 'Join Team'}
+                </Button>
+              )}
+              {isFounder && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  {!editing ? (
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => setEditing(true)} className="border-border hover:bg-primary/10 hover:text-primary">
+                        Edit Team
+                      </Button>
+                      <Button variant="outline" asChild className="border-border hover:bg-primary/10 hover:text-primary">
+                        <Link href={`/teams/${team.id}/settings`}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Link>
+                      </Button>
+                      <Button variant="outline" onClick={deleteTeam} disabled={deleting} className="border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                        {deleting ? 'Deleting...' : 'Delete Team'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="w-full bg-muted/50 p-4 rounded-lg border border-border">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                        <input
+                          className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          value={editForm.name}
+                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          placeholder="Team name"
+                        />
+                        <input
+                          className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          value={editForm.description}
+                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                          placeholder="Description"
+                        />
+                        <label className="text-sm flex items-center gap-2 text-foreground">
+                          <input 
+                            type="checkbox" 
+                            checked={editForm.isPublic} 
+                            onChange={(e) => setEditForm({ ...editForm, isPublic: e.target.checked })}
+                            className="rounded border-border text-primary focus:ring-primary"
+                          />
+                          Public Team
+                        </label>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button onClick={saveTeam} disabled={saving} className="bg-primary text-primary-foreground hover:opacity-90">
+                          {saving ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                        <Button variant="outline" onClick={() => setEditing(false)} className="border-border hover:bg-muted">
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Team Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Members */}
-            <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-all duration-200 hover:border-primary/40">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Users className="mr-2 h-5 w-5" />
+              <CardTitle className="flex items-center text-foreground">
+                <Users className="mr-2 h-5 w-5 text-primary" />
                 Team Members
               </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                {teamMembers.length + 1} total members
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Founder */}
               {founder && (
-                <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={founder.avatar} className='font-bold' alt={founder.name} />
-                    <AvatarFallback>{founder.name.charAt(0)}</AvatarFallback>
+                <div className="flex items-center space-x-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+                  <Avatar className="h-10 w-10 ring-2 ring-primary/30">
+                    <AvatarImage src={founder.avatar} alt={founder.name} />
+                    <AvatarFallback className="bg-primary text-primary-foreground">{founder.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <p className="font-medium">{founder.name}</p>
+                      <p className="font-medium text-foreground">{founder.name}</p>
                       <Crown className="w-4 h-4 text-yellow-500" />
                     </div>
-                    <p className="text-sm text-slate-300">Founder</p>
+                    <p className="text-sm text-muted-foreground">Founder</p>
                   </div>
                 </div>
               )}
               
               {/* Members */}
               {teamMembers.map((member) => (
-                <div key={member.userId} className="flex items-center space-x-3">
+                <div key={member.userId} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback>{member.name?.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="bg-secondary text-secondary-foreground">{member.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-medium">{member.name}</p>
+                    <p className="font-medium text-foreground">{member.name}</p>
                     <p className="text-sm text-muted-foreground">{member.role}</p>
                   </div>
                 </div>
               ))}
+              {teamMembers.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-2">No additional members yet</p>
+              )}
             </CardContent>
           </Card>
 
           {/* Open Roles */}
-          <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-all duration-200 hover:border-primary/40">
             <CardHeader>
-              <CardTitle>Open Roles</CardTitle>
-              <CardDescription className='text-gray-400'>Positions we're looking to fill</CardDescription>
+              <CardTitle className="text-foreground">Open Roles</CardTitle>
+              <CardDescription className="text-muted-foreground">Positions we're looking to fill</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 text-white">
+              <div className="space-y-2">
                 {team.openRoles && team.openRoles.length > 0 ? (
-                  team.openRoles.map((role) => (
-                    <Badge key={role} variant="outline" className="mr-2 mb-2 text-white">
-                      {role}
-                    </Badge>
-                  ))
+                  <div className="flex flex-wrap gap-2">
+                    {team.openRoles.map((role) => (
+                      <Badge key={role} variant="outline" className="bg-primary/20 text-primary border-primary/30">
+                        {role}
+                      </Badge>
+                    ))}
+                  </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">No open positions</p>
+                  <div className="text-center py-6">
+                    <Target className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">No open positions</p>
+                  </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
           {/* Quick Stats */}
-          <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-all duration-200 hover:border-primary/40">
             <CardHeader>
-              <CardTitle>Activity</CardTitle>
+              <CardTitle className="text-foreground">Activity</CardTitle>
+              <CardDescription className="text-muted-foreground">Team activity overview</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground text-slate-300">Messages</span>
-                <span className="font-medium">0</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  <span className="text-sm text-foreground">Messages</span>
+                </div>
+                <span className="font-semibold text-primary">0</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground text-slate-300">Tasks</span>
-                <span className="font-medium">0</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  <span className="text-sm text-foreground">Tasks</span>
+                </div>
+                <span className="font-semibold text-primary">0</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground text-slate-300">Completed</span>
-                <span className="font-medium">0</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-sm text-foreground">Completed</span>
+                </div>
+                <span className="font-semibold text-primary">0</span>
               </div>
             </CardContent>
           </Card>
@@ -433,16 +473,16 @@ export default function TeamDetailPage() {
         {/* Team Content Tabs */}
         {hasAccess && (
           <Tabs defaultValue="chat" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="chat" className="flex items-center">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-border">
+              <TabsTrigger value="chat" className="flex items-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Chat
               </TabsTrigger>
-              <TabsTrigger value="tasks" className="flex items-center">
+              <TabsTrigger value="tasks" className="flex items-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Target className="mr-2 h-4 w-4" />
                 Tasks
               </TabsTrigger>
-              <TabsTrigger value="members" className="flex items-center">
+              <TabsTrigger value="members" className="flex items-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Users className="mr-2 h-4 w-4" />
                 Members
               </TabsTrigger>
@@ -457,10 +497,10 @@ export default function TeamDetailPage() {
             </TabsContent>
 
             <TabsContent value="members">
-              <Card>
+              <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg">
                 <CardHeader>
-                  <CardTitle>Team Members</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-foreground">Team Members</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Manage team members and their roles
                   </CardDescription>
                 </CardHeader>
@@ -468,45 +508,45 @@ export default function TeamDetailPage() {
                   <div className="space-y-6">
                     {/* Founder */}
                     {founder && (
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center justify-between p-6 border border-border rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
                         <div className="flex items-center space-x-4">
-                          <Avatar className="h-12 w-12">
+                          <Avatar className="h-12 w-12 ring-2 ring-primary/30">
                             <AvatarImage src={founder.avatar} alt={founder.name} />
-                            <AvatarFallback>{founder.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback className="bg-primary text-primary-foreground">{founder.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
                             <div className="flex items-center space-x-2">
-                              <h3 className="font-semibold">{founder.name}</h3>
+                              <h3 className="font-semibold text-foreground">{founder.name}</h3>
                               <Crown className="w-4 h-4 text-yellow-500" />
                             </div>
                             <p className="text-sm text-muted-foreground">{founder.email}</p>
-                            <div className="flex gap-1 mt-2">
+                            <div className="flex flex-wrap gap-1 mt-2">
                               {founder.skills && founder.skills.slice(0, 3).map((skill) => (
-                                <Badge key={skill} variant="secondary" className="text-xs">
+                                <Badge key={skill} className="bg-primary/20 text-primary border-primary/30 text-xs">
                                   {skill}
                                 </Badge>
                               ))}
                             </div>
                           </div>
                         </div>
-                        <Badge variant="default">Founder</Badge>
+                        <Badge className="bg-primary text-primary-foreground">Founder</Badge>
                       </div>
                     )}
 
                     {/* Members */}
                     {teamMembers.map((member) => (
-                      <div key={member.userId} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div key={member.userId} className="flex items-center justify-between p-6 border border-border rounded-lg hover:bg-muted/30 transition-colors">
                         <div className="flex items-center space-x-4">
                           <Avatar className="h-12 w-12">
                             <AvatarImage src={member.avatar} alt={member.name} />
-                            <AvatarFallback>{member.name?.charAt(0)}</AvatarFallback>
+                            <AvatarFallback className="bg-secondary text-secondary-foreground">{member.name?.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <h3 className="font-semibold">{member.name}</h3>
+                            <h3 className="font-semibold text-foreground">{member.name}</h3>
                             <p className="text-sm text-muted-foreground">{member.email}</p>
-                            <div className="flex gap-1 mt-2">
+                            <div className="flex flex-wrap gap-1 mt-2">
                             {member.skills && member.skills.slice(0, 3).map((skill: string) => (
-                              <Badge key={skill} variant="secondary" className="text-xs">
+                              <Badge key={skill} className="bg-secondary/20 text-secondary-foreground border-secondary/30 text-xs">
                                 {skill}
                               </Badge>
                             ))}
@@ -514,7 +554,7 @@ export default function TeamDetailPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge variant="outline">{member.role}</Badge>
+                          <Badge variant="outline" className="border-border text-foreground">{member.role}</Badge>
                           <p className="text-xs text-muted-foreground mt-1">
                             Joined {new Date(member.joinedAt).toLocaleDateString()}
                           </p>
@@ -523,8 +563,10 @@ export default function TeamDetailPage() {
                     ))}
 
                     {teamMembers.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No team members yet. Share your team to invite others!
+                      <div className="text-center py-12">
+                        <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-medium text-foreground mb-2">No team members yet</h3>
+                        <p className="text-muted-foreground">Share your team to invite others!</p>
                       </div>
                     )}
                   </div>
@@ -535,14 +577,14 @@ export default function TeamDetailPage() {
         )}
 
         {!hasAccess && (
-          <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg">
             <CardContent className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Join the team to access more features</h3>
+              <Users className="mx-auto h-12 w-12 text-primary mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Join the team to access more features</h3>
               <p className="text-muted-foreground mb-6">
                 Connect with the team to view chat, tasks, and collaborate together.
               </p>
-              <Button onClick={requestToJoin} disabled={requesting}>
+              <Button onClick={requestToJoin} disabled={requesting} className="bg-primary text-primary-foreground hover:opacity-90">
                 <Plus className="mr-2 h-4 w-4" />
                 {requesting ? 'Requesting...' : 'Request to Join'}
               </Button>
@@ -552,33 +594,39 @@ export default function TeamDetailPage() {
 
         {/* Pending Join Requests for Founder */}
         {isFounder && (
-          <Card className='bg-white'>
+          <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg">
             <CardHeader>
-              <CardTitle>Pending Join Requests</CardTitle>
-              <CardDescription>Approve users who requested to join</CardDescription>
+              <CardTitle className="text-foreground flex items-center">
+                <Bell className="mr-2 h-5 w-5 text-primary" />
+                Pending Join Requests
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">Approve users who requested to join</CardDescription>
             </CardHeader>
             <CardContent>
               {pendingRequests.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No pending requests</p>
+                <div className="text-center py-8">
+                  <Bell className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">No pending requests</p>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {pendingRequests.map((req: any) => (
-                    <div key={req.id} className="flex items-center justify-between p-3 border rounded-md">
+                    <div key={req.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="h-10 w-10">
                           <AvatarImage src={req.sender?.avatar} />
-                          <AvatarFallback>{req.sender?.name?.[0] || 'U'}</AvatarFallback>
+                          <AvatarFallback className="bg-secondary text-secondary-foreground">{req.sender?.name?.[0] || 'U'}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium">{req.sender?.name}</div>
+                          <div className="font-medium text-foreground">{req.sender?.name}</div>
                           <div className="text-xs text-muted-foreground">{req.sender?.email}</div>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" onClick={() => approveJoin(req.sender?.id)} disabled={approving}>
+                        <Button size="sm" onClick={() => approveJoin(req.sender?.id)} disabled={approving} className="bg-primary text-primary-foreground hover:opacity-90">
                           {approving ? 'Approving...' : 'Approve'}
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => declineJoin(req.sender?.id)} disabled={decliningId === req.sender?.id}>
+                        <Button size="sm" variant="outline" onClick={() => declineJoin(req.sender?.id)} disabled={decliningId === req.sender?.id} className="border-border hover:bg-muted">
                           {decliningId === req.sender?.id ? 'Declining...' : 'Decline'}
                         </Button>
                       </div>

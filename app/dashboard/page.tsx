@@ -165,7 +165,7 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-6">
           <h1 className="text-3xl font-display font-bold text-foreground mb-2">
-            Welcome back, {session?.user?.name || "Entrepreneur"}! 👋
+            Welcome back, {session?.user?.name || "Entrepreneur"}! 👋🏻
           </h1>
           <p className="text-muted-foreground text-lg">
             Ready to build something amazing? Let's get your team together.

@@ -89,16 +89,16 @@ export default function TeamsPage() {
         {/* Teams Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teams.length === 0 ? (
-            <Card className='bg-card text-foreground'>
+            <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg">
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <Users className="h-12 w-12 text-muted-foreground mb-4" />
+                <Users className="h-12 w-12 text-primary mb-4" />
                 <h3 className="text-lg font-display font-semibold text-foreground mb-2">
                   No Teams Yet
                 </h3>
                 <p className="text-muted-foreground text-center mb-4 font-sans">
                   Start building your dream team by creating your first team
                 </p>
-                <Button asChild className="font-medium">
+                <Button asChild className="bg-primary text-primary-foreground hover:opacity-90">
                   <Link href="/teams/create">
                     <Plus className="mr-2 h-4 w-4" />
                     Create Your First Team
@@ -108,20 +108,36 @@ export default function TeamsPage() {
             </Card>
           ) : (
             teams.map((team) => (
-              <Card key={team.id} className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
+              <Card key={team.id} className="bg-card/50 backdrop-blur-sm border-border shadow-lg hover:shadow-xl transition-all duration-200 hover:border-primary/40">
                 <CardHeader>
-                  <CardTitle className="font-display font-semibold">{team.name}</CardTitle>
-                  <CardDescription className="font-sans">{team.industry}</CardDescription>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="font-display font-semibold text-foreground">{team.name}</CardTitle>
+                      <CardDescription className="font-sans text-muted-foreground">{team.industry}</CardDescription>
+                    </div>
+                    <Badge className="bg-primary/20 text-primary border-primary/30">
+                      {team.members?.length || 0} members
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-2 text-sm line-clamp-2 overflow-hidden">{team.description}</div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {team.openRoles && team.openRoles.map((role, idx) => (
-                      <Badge key={idx} variant="outline" className="bg-slate-600">{role}</Badge>
-                    ))}
+                  <div className="mb-4 text-sm line-clamp-2 overflow-hidden text-muted-foreground">{team.description}</div>
+                  {team.openRoles && team.openRoles.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-sm text-muted-foreground mb-2">Looking for:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {team.openRoles.map((role, idx) => (
+                          <Badge key={idx} variant="outline" className="bg-primary/20 text-primary border-primary/30">
+                            {role}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground mb-4">
+                    Stage: <span className="text-foreground font-medium">{team.stage}</span>
                   </div>
-                  <div className="text-xs text-gray-300 mb-2">Stage: {team.stage}</div>
-                  <Button asChild variant="secondary">
+                  <Button asChild className="bg-primary text-primary-foreground hover:opacity-90 w-full">
                     <Link href={`/teams/${team.id}`}>View Team</Link>
                   </Button>
                 </CardContent>
@@ -131,20 +147,31 @@ export default function TeamsPage() {
         </div>
 
         {/* Explore Section */}
-        <Card className='bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 text-white'>
+        <Card className="bg-card/50 backdrop-blur-sm border-border shadow-lg">
           <CardHeader>
-            <CardTitle className="font-display font-semibold">Explore Teams</CardTitle>
-            <CardDescription className="font-sans">
+            <CardTitle className="font-display font-semibold text-foreground flex items-center">
+              <Search className="mr-2 h-5 w-5 text-primary" />
+              Explore Teams
+            </CardTitle>
+            <CardDescription className="font-sans text-muted-foreground">
               Find teams that match your skills and interests
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8">
-              <Search className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground font-sans">No teams available to explore yet</p>
-              <p className="text-sm text-muted-foreground font-sans mt-2">
+              <Search className="mx-auto h-12 w-12 text-primary mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No teams available to explore yet</h3>
+              <p className="text-sm text-muted-foreground font-sans">
                 Teams will appear here as other entrepreneurs create them
               </p>
+              <div className="mt-6">
+                <Button asChild className="bg-primary text-primary-foreground hover:opacity-90">
+                  <Link href="/explore">
+                    <Search className="mr-2 h-4 w-4" />
+                    Explore All
+                  </Link>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

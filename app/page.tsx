@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Sparkles, Zap, Target, Star, CheckCircle, Menu } from 'lucide-react';
+import { ArrowRight, Zap, Target, Star, CheckCircle, Menu } from 'lucide-react';
 import Link from 'next/link';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
