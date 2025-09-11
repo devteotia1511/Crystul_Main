@@ -182,7 +182,7 @@ export default function DashboardNavbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem onClick={() => signOut()} className="text-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+              <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })} className="text-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign Out
               </DropdownMenuItem>
