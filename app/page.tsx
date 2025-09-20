@@ -223,15 +223,15 @@ export default function HomePage() {
               {/* Stats */}
             <div className="grid grid-cols-3 gap-6 pt-8 max-w-2xl mx-auto">
                 <div className="text-center">
-                <div className="text-3xl font-display font-bold text-primary">100+</div>
+                <div className="text-3xl font-display font-bold text-primary">-</div>
                 <div className="text-sm font-sans text-foreground/80">Entrepreneurs</div>
                 </div>
                 <div className="text-center">
-                <div className="text-3xl font-display font-bold text-secondary-foreground">50+</div>
+                <div className="text-3xl font-display font-bold text-secondary-foreground">-</div>
                 <div className="text-sm font-sans text-foreground/80">Teams Formed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-display font-bold text-primary">10+</div>
+                <div className="text-3xl font-display font-bold text-primary">-</div>
                 <div className="text-sm font-sans text-foreground/80">Startups Launched</div>
               </div>
             </div>
@@ -260,11 +260,11 @@ export default function HomePage() {
                   className="w-8 h-8 object-contain"
                 />
               </div>
-              <CardTitle className="font-display font-semibold text-foreground">Smart Matching</CardTitle>
+              <CardTitle className="font-display font-semibold text-foreground">Sharpen Your Idea with 1:1 Power Sessions</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="font-sans text-muted-foreground">
-                Our AI-powered algorithm finds the perfect teammates based on skills, experience, and compatibility.
+                
               </CardDescription>
             </CardContent>
           </Card>
