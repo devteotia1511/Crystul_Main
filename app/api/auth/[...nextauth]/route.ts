@@ -1,6 +1,6 @@
 // app/api/auth/[...nextauth]/route.ts
 
-import NextAuth, { NextAuthOptions } from "next-auth"; // Keep NextAuthOptions for typing authOptions
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getRequiredEnvVar } from "@/lib/env-validation";
@@ -8,10 +8,8 @@ import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
-// --- CHANGE START ---
-// Removed 'export' from 'authOptions'
-const authOptions: NextAuthOptions = {
-// --- CHANGE END ---
+// Keep 'export' here for authOptions
+export const authOptions: NextAuthOptions = { // 'authOptions' is now exported again
   providers: [
     GoogleProvider({
       clientId: getRequiredEnvVar("GOOGLE_CLIENT_ID"),
@@ -30,7 +28,7 @@ const authOptions: NextAuthOptions = {
 
         try {
           const dbConnection = await dbConnect();
-
+          
           // If no database connection (development with placeholder), allow demo login
           if (!dbConnection) {
             console.warn('⚠️  No database connection in development, allowing demo login');
@@ -42,9 +40,9 @@ const authOptions: NextAuthOptions = {
               image: null
             };
           }
-
+          
           const user = await User.findOne({ email: credentials.email });
-
+          
           if (!user) {
             return null;
           }
@@ -125,5 +123,7 @@ const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-// This line is correct for Next.js App Router for NextAuth v4
+// Export GET and POST for the route handler
 export { handler as GET, handler as POST };
+
+// No need to explicitly export authOptions again if it's already declared with 'export const'
