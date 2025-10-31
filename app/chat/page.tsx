@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

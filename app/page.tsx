@@ -98,7 +98,7 @@ export default function HomePage() {
           <div className="flex items-center space-x-1">
             <div className="relative">
               <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-                <img src="/crystul.png" alt="Crystul Logo" />
+                <Image src="/crystul.png" alt="Crystul Logo" width={48} height={48} />
               </div>
             </div>
             <span className="text-2xl font-bold text-foreground">
@@ -113,9 +113,6 @@ export default function HomePage() {
             </Link>
             <Link href="/connect-founders">
               <span className="text-foreground hover:text-primary font-heading transition-colors font-medium">Connect</span>
-            </Link>
-            <Link href="/explore">
-              <span className="text-foreground hover:text-primary font-heading transition-colors font-medium">Explore</span>
             </Link>
             <Link href="/promotions">
               <span className="text-foreground hover:text-primary font-heading transition-colors font-medium">Promotions</span>
@@ -152,9 +149,6 @@ export default function HomePage() {
                 </DropdownMenuItem>
                   <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10">
                   <Link href="/connect-founders">Connect with Founders</Link>
-                </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10">
-                  <Link href="/explore">Explore Teams</Link>
                 </DropdownMenuItem>
                   <DropdownMenuItem asChild className="text-foreground hover:text-primary hover:bg-primary/10">
                     <Link href="/promotions">Promotions</Link>
@@ -250,23 +244,21 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
           <Card className="border-border bg-card/50 shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
             <CardHeader>
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
-                <img 
+                <Image 
                   src="/crystul.png" 
                   alt="Crystul Logo" 
-                  className="w-8 h-8 object-contain"
+                  width={32} 
+                  height={32} 
+                  className="object-contain"
                 />
               </div>
-              <CardTitle className="font-display font-semibold text-foreground">Sharpen Your Idea with 1:1 Power Sessions</CardTitle>
+              <CardTitle className="font-display text-primary">Smart Pitching Platform</CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="font-sans text-muted-foreground">
-                
-              </CardDescription>
-            </CardContent>
+            
           </Card>
 
           <Card className="border-border bg-card/50 shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
@@ -274,13 +266,8 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-secondary-foreground" />
               </div>
-              <CardTitle className="font-display font-semibold text-foreground">Real-time Chat</CardTitle>
+              <CardTitle className="font-display text-primary">Team Making & Networking Platform</CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="font-sans text-muted-foreground">
-                Stay connected with your team through instant messaging, file sharing, and video calls.
-              </CardDescription>
-            </CardContent>
           </Card>
 
           <Card className="border-border bg-card/50 shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
@@ -288,13 +275,8 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
                 <Target className="w-6 h-6 text-primary" />
               </div>
-              <CardTitle className="font-display font-semibold text-foreground">Project Management</CardTitle>
+              <CardTitle className="font-display text-primary">Fundraising Section</CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="font-sans text-muted-foreground">
-                Organize tasks, set milestones, and track progress with our intuitive Kanban boards.
-              </CardDescription>
-            </CardContent>
           </Card>
 
           <Card className="border-border bg-card/50 shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
@@ -302,13 +284,23 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mb-4">
                 <Star className="w-6 h-6 text-secondary-foreground" />
               </div>
-              <CardTitle className="font-display font-semibold text-foreground">Launch Ready</CardTitle>
+              <CardTitle className="font-display text-primary">Business Flowdesk</CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="font-sans text-muted-foreground">
-                Create beautiful public profiles to showcase your startup and attract investors.
-              </CardDescription>
-            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card/50 shadow-lg hover:shadow-xl transition-shadow hover:border-primary/40">
+            <CardHeader>
+            <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
+                <Image 
+                  src="/crystul.png" 
+                  alt="Crystul Logo" 
+                  width={32} 
+                  height={32} 
+                  className="object-contain"
+                />
+              </div>
+              <CardTitle className="font-display text-primary"> Connect with C-Suite Executives</CardTitle>
+            </CardHeader>
           </Card>
         </div>
       </section>
@@ -318,15 +310,15 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-display font-bold text-primary mb-2">100+</div>
+              <div className="text-4xl font-display font-bold text-primary mb-2">-</div>
               <div className="text-muted-foreground font-sans">Active Entrepreneurs</div>
             </div>
             <div>
-              <div className="text-4xl font-display font-bold text-secondary-foreground mb-2">50+</div>
+              <div className="text-4xl font-display font-bold text-secondary-foreground mb-2">-</div>
               <div className="text-muted-foreground font-sans">Teams Formed</div>
             </div>
             <div>
-              <div className="text-4xl font-display font-bold text-primary mb-2">10+</div>
+              <div className="text-4xl font-display font-bold text-primary mb-2">-</div>
               <div className="text-muted-foreground font-sans">Startups Launched</div>
             </div>
           </div>
@@ -347,43 +339,57 @@ export default function HomePage() {
         {/* Row 1 */}
         <div className="grid md:grid-cols-2 gap-10 items-center mb-16">
           <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-            <img src="/image1.png" alt="Funding discussion" className="w-full h-full object-cover" />
+            <Image src="/image1.png" alt="Funding discussion" layout="fill" className="object-cover" />
           </div>
           <div className="space-y-3">
             <h3 className="text-3xl font-serif font-semibold text-foreground">
-              Discover and Apply to Curated Funding Partners
+              BUILD A POWERHOUSE TEAM
             </h3>
             <p className="text-muted-foreground font-sans">
-              As a verified team on Crystul, you gain access to a curated pool of funding partners
-              and accelerators. Share your profile, traction, and goals — our platform helps route your
-              pitch to the most relevant partners.
+            Form the ideal founding team by connecting with top professionals and domain experts who align with your startup’s vision and mission. Crystul’s intelligent matching algorithm ensures you find the right co-founders, collaborators, and advisors through transparent profiling and equitable collaboration options. Build a strong foundation for your startup by surrounding yourself with the right people from day one.
             </p>
-            <ul className="list-disc ml-5 space-y-2 text-muted-foreground font-sans">
-              <li>Create a rich team profile and funding round details</li>
-              <li>Get matched with partners aligned to your stage and industry</li>
-              <li>Track outreach and communication in one place</li>
-            </ul>
           </div>
         </div>
 
-        {/* Row 2 (alternate sides) */}
         <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
           <div className="md:order-2 relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-            <img src="/image2.png" alt="Pitch deck review" className="w-full h-full object-cover" />
+            <Image src="/image2.png" alt="Pitch deck review" layout="fill" className="object-cover" />
           </div>
           <div className="md:order-1 space-y-3">
             <h3 className="text-3xl font-serif font-semibold text-foreground">
-              Pitch, Get Feedback, and Close Your Round
+              Streamline Your Teams Execution with FlowDesk
             </h3>
             <p className="text-muted-foreground font-sans">
-              Start a conversation directly with partners, share your deck and metrics, and coordinate
-              follow-ups from within chat. When it&apos;s a fit, move from intro to diligence seamlessly.
+              Empower your startup to operate seamlessly with FlowDesk - a unified workspace for real-time collaboration. Manage tasks, communicate with teammates, and track progress across projects without switching between tools. FlowDesk helps startups stay aligned, productive, and execution-driven from ideation to delivery.
             </p>
-            <ul className="list-disc ml-5 space-y-2 text-muted-foreground font-sans">
-              <li>Direct messaging with partners</li>
-              <li>Share docs and links securely</li>
-              <li>Stay organized with a single source of truth</li>
-            </ul>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10 items-center mb-16">
+          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <Image src="/image1.png" alt="Funding discussion" layout="fill" className="object-cover" />
+          </div>
+          <div className="md:order-1 space-y-3">
+            <h3 className="text-3xl font-serif font-semibold text-foreground">
+              AI-Driven Ideation & Team Support
+            </h3>
+            <p className="text-muted-foreground font-sans">
+            Leverage the power of an AI assistant designed for founders. Crystul&apos;s AI ideation companion helps you brainstorm, prototype, validate ideas, and match with skilled teammates in real-time. Receive intelligent suggestions, blueprint templates, and rapid validation insights that accelerate your startup journey from concept to execution.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
+          <div className="md:order-2 relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <Image src="/image4.png" alt="Pitch deck review" layout="fill" className="object-cover" />
+          </div>
+          <div className="md:order-1 space-y-3">
+            <h3 className="text-3xl font-serif font-semibold text-foreground">
+              Unified Funding & Pitching Marketplace
+            </h3>
+            <p className="text-muted-foreground font-sans">
+              Simplify your funding journey with a centralized marketplace for grants, accelerators, and venture partners. Crystul connects verified teams with tailored funding opportunities, offering live eligibility checks, pitch tracking, and one-click applications — all from one integrated dashboard.
+            </p>
           </div>
         </div>
 
@@ -495,11 +501,14 @@ export default function HomePage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div>
               <div className="text-primary flex justify-center gap-2 sm:justify-start">
-              <img 
+              <Image 
                 src="/crystul.png" 
                 alt="Crystul Logo" 
-                  className="h-10 w-10 rounded-full"
-                />
+                className="h-10 w-10 rounded-full"
+                layout="fixed"
+                width={40}
+                height={40}
+              />
                 <span className="text-2xl font-mono font-bold">
                   Crystul
                 </span>
