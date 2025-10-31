@@ -1,4 +1,6 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+// app/api/auth/[...nextauth]/route.ts
+
+import NextAuth, { NextAuthOptions } from "next-auth"; // Keep NextAuthOptions for typing authOptions
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getRequiredEnvVar } from "@/lib/env-validation";
@@ -6,7 +8,10 @@ import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
-export const authOptions: NextAuthOptions = {
+// --- CHANGE START ---
+// Removed 'export' from 'authOptions'
+const authOptions: NextAuthOptions = {
+// --- CHANGE END ---
   providers: [
     GoogleProvider({
       clientId: getRequiredEnvVar("GOOGLE_CLIENT_ID"),
@@ -25,7 +30,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const dbConnection = await dbConnect();
-          
+
           // If no database connection (development with placeholder), allow demo login
           if (!dbConnection) {
             console.warn('⚠️  No database connection in development, allowing demo login');
@@ -37,9 +42,9 @@ export const authOptions: NextAuthOptions = {
               image: null
             };
           }
-          
+
           const user = await User.findOne({ email: credentials.email });
-          
+
           if (!user) {
             return null;
           }
@@ -120,4 +125,5 @@ export const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 
+// This line is correct for Next.js App Router for NextAuth v4
 export { handler as GET, handler as POST };
